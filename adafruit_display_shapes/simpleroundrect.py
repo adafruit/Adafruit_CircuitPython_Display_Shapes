@@ -49,7 +49,7 @@ class SimpleRoundRect(displayio.TileGrid):
         palette.make_transparent(0)
         palette[1] = fill
 
-        # these them so fill can be adjusted later
+        # save these so fill can be adjusted later
         self._palette = palette
         self._shape = shape
 
@@ -75,6 +75,7 @@ class SimpleRoundRect(displayio.TileGrid):
 
     @property
     def fill(self):
+        """The infill color, this can be set with rgb hex or `None` for clear"""
         return self._palette[1]
 
     @fill.setter
@@ -87,12 +88,15 @@ class SimpleRoundRect(displayio.TileGrid):
 
     @property
     def width(self):
+        """The horizonal dimension of the rectangle in pixels"""
         return self._width
 
     @property
     def height(self):
+        """The vertical dimension of the rectangle in pixels"""
         return self._height
 
     @property
     def radius(self):
+        """The radius for the corners in pixels"""
         return self._radius
