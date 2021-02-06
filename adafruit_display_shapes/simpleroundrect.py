@@ -19,6 +19,19 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.gi
 
 
 class SimpleRoundRect(displayio.TileGrid):
+    # pylint: disable=too-many-arguments
+    """A round-corner rectangle with a smaller memory foorprint. All the corners
+        have the same same radius.
+
+    :param x: The x-position of the top left corner.
+    :param y: The y-position of the top left corner.
+    :param width: The width of the rounded-corner rectangle.
+    :param height: The height of the rounded-corner rectangle.
+    :param radius: The radius of the rounded corner.
+    :param fill: The color to fill the rounded-corner rectangle. Can be a hex value for a color or
+                 ``None`` for transparent.
+    """
+
     def __init__(self, x, y, width, height, radius=0, fill=0xFF0000):
 
         # the palette and shpae can only be stored after __init__
@@ -26,9 +39,9 @@ class SimpleRoundRect(displayio.TileGrid):
         shape = displayio.Shape(
             width,
             height,
-            # mirror_x and mirror_y are False until a core displayio bug is fixed
+            # mirror_x is False due to a core displayio bug
             mirror_x=False,
-            mirror_y=False,
+            mirror_y=True,
         )
         super().__init__(shape, pixel_shader=palette, x=x, y=y)
 
@@ -41,16 +54,19 @@ class SimpleRoundRect(displayio.TileGrid):
         self._shape = shape
 
         # clip a too large radius to the max allowed
-        radius = min(radius, width // 2, height // 2)
+        radius = min(radius, round(width / 2), round(height / 2))
 
         # calculate and apply the radius row by row
         rsqrd = radius ** 2
         for row_offset in range(0, radius):
-            left_indent = radius - round(math.sqrt(rsqrd - (row_offset - radius) ** 2))
+            left_indent = radius - int(math.sqrt(rsqrd - (row_offset - radius) ** 2))
             right_indent = width - left_indent - 1
 
-            shape.set_boundary(row_offset, left_indent, right_indent)
-            shape.set_boundary(height - row_offset - 1, left_indent, right_indent)
+            shape.set_boundary(
+                row_offset,
+                left_indent,
+                right_indent,
+            )
 
         # store for read only access later
         self._radius = radius
