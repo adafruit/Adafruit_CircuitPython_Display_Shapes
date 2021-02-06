@@ -24,3 +24,6 @@
 
 .. automodule:: adafruit_display_shapes.sparkline
   :members:
+
+  .. automodule:: adafruit_display_shapes.simpleroundrect
+    :members:
