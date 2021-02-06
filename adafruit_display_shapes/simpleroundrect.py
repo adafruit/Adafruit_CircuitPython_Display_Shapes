@@ -20,8 +20,8 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.gi
 
 class SimpleRoundRect(displayio.TileGrid):
     # pylint: disable=too-many-arguments
-    """A round-corner rectangle with lower memory usage than RoundRect. All the corners
-        have the same radius and no outline.
+    """A round-corner rectangle with lower memory usage than RoundRect.There is
+        no outline and all the corners have the same radius.
 
     :param x: The x-position of the top left corner.
     :param y: The y-position of the top left corner.
