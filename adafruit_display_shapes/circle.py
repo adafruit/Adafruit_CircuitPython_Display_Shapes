@@ -53,3 +53,5 @@ class Circle(RoundRect):
             outline=outline,
             stroke=stroke,
         )
+        self.x0 = x0 # added by empirical-dan
+        self.y0 = y0 # added by empirical-dan
