@@ -53,5 +53,14 @@ class Circle(RoundRect):
             outline=outline,
             stroke=stroke,
         )
-        self.x0 = x0 # added by empirical-dan
-        self.y0 = y0 # added by empirical-dan
+        self.r = r
+        
+        @property
+        def x0(self):
+            """The x-position of the center."""
+            return self.x + self.r
+        
+        @property
+        def y0(self):
+            """The y-position of the center."""
+            return self.y + self.r
