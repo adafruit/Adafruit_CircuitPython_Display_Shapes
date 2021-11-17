@@ -51,5 +51,3 @@ class Line(Polygon):
     def color(self, color):
         self.outline = color
         return
-      
-      
