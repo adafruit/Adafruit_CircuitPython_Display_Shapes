@@ -11,6 +11,11 @@ an explicit call to palette.make_opaque() in the fill color setter function.
 
 """
 
+try:
+    from typing import Optional
+except ImportError:
+    pass
+
 import displayio
 
 __version__ = "0.0.0-auto.0"
@@ -35,7 +40,18 @@ class RoundRect(displayio.TileGrid):
 
     """
 
-    def __init__(self, x, y, width, height, r, *, fill=None, outline=None, stroke=1):
+    def __init__(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        r: int,
+        *,
+        fill: Optional[int] = None,
+        outline: Optional[int] = None,
+        stroke: int = 1,
+    ) -> None:
         self._palette = displayio.Palette(3)
         self._palette.make_transparent(0)
         self._bitmap = displayio.Bitmap(width, height, 3)
@@ -85,17 +101,17 @@ class RoundRect(displayio.TileGrid):
     # pylint: disable=invalid-name, too-many-locals, too-many-branches
     def _helper(
         self,
-        x0,
-        y0,
-        r,
+        x0: int,
+        y0: int,
+        r: int,
         *,
-        color,
-        x_offset=0,
-        y_offset=0,
-        stroke=1,
-        corner_flags=0xF,
-        fill=False
-    ):
+        color: int,
+        x_offset: int = 0,
+        y_offset: int = 0,
+        stroke: int = 1,
+        corner_flags: int = 0xF,
+        fill: bool = False,
+    ) -> None:
         f = 1 - r
         ddF_x = 1
         ddF_y = -2 * r
@@ -142,13 +158,13 @@ class RoundRect(displayio.TileGrid):
     # pylint: enable=invalid-name, too-many-locals, too-many-branches
 
     @property
-    def fill(self):
+    def fill(self) -> int:
         """The fill of the rounded-corner rectangle. Can be a hex value for a color or ``None`` for
         transparent."""
         return self._palette[2]
 
     @fill.setter
-    def fill(self, color):
+    def fill(self, color: int) -> None:
         if color is None:
             self._palette[2] = 0
             self._palette.make_transparent(2)
@@ -157,13 +173,13 @@ class RoundRect(displayio.TileGrid):
             self._palette.make_opaque(2)
 
     @property
-    def outline(self):
+    def outline(self) -> int:
         """The outline of the rounded-corner rectangle. Can be a hex value for a color or ``None``
         for no outline."""
         return self._palette[1]
 
     @outline.setter
-    def outline(self, color):
+    def outline(self, color: int) -> None:
         if color is None:
             self._palette[1] = 0
             self._palette.make_transparent(1)
