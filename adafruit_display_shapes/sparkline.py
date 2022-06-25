@@ -115,11 +115,11 @@ class Sparkline(displayio.Group):
     # pylint: disable=no-else-return
     @staticmethod
     def _xintercept(
-        x_1: int,
+        x_1: float,
         y_1: float,
-        x_2: int,
+        x_2: float,
         y_2: float,
-        horizontal_y: int,
+        horizontal_y: float,
     ) -> Optional[
         int
     ]:  # finds intercept of the line and a horizontal line at horizontalY

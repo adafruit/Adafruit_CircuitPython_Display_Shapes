@@ -138,13 +138,13 @@ class Polygon(displayio.TileGrid):
     # pylint: enable=invalid-name, too-many-locals, too-many-branches
 
     @property
-    def outline(self) -> int:
+    def outline(self) -> Optional[int]:
         """The outline of the polygon. Can be a hex value for a color or
         ``None`` for no outline."""
         return self._palette[1]
 
     @outline.setter
-    def outline(self, color: int) -> None:
+    def outline(self, color: Optional[int]) -> None:
         if color is None:
             self._palette[1] = 0
             self._palette.make_transparent(1)

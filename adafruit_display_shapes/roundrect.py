@@ -158,13 +158,13 @@ class RoundRect(displayio.TileGrid):
     # pylint: enable=invalid-name, too-many-locals, too-many-branches
 
     @property
-    def fill(self) -> int:
+    def fill(self) -> Optional[int]:
         """The fill of the rounded-corner rectangle. Can be a hex value for a color or ``None`` for
         transparent."""
         return self._palette[2]
 
     @fill.setter
-    def fill(self, color: int) -> None:
+    def fill(self, color: Optional[int]) -> None:
         if color is None:
             self._palette[2] = 0
             self._palette.make_transparent(2)
@@ -173,13 +173,13 @@ class RoundRect(displayio.TileGrid):
             self._palette.make_opaque(2)
 
     @property
-    def outline(self) -> int:
+    def outline(self) -> Optional[int]:
         """The outline of the rounded-corner rectangle. Can be a hex value for a color or ``None``
         for no outline."""
         return self._palette[1]
 
     @outline.setter
-    def outline(self, color: int) -> None:
+    def outline(self, color: Optional[int]) -> None:
         if color is None:
             self._palette[1] = 0
             self._palette.make_transparent(1)
