@@ -39,6 +39,10 @@ Implementation Notes
 
 # pylint: disable=too-many-instance-attributes
 
+try:
+    from typing import Optional, List
+except ImportError:
+    pass
 import displayio
 from adafruit_display_shapes.line import Line
 
@@ -59,15 +63,15 @@ class Sparkline(displayio.Group):
 
     def __init__(
         self,
-        width,
-        height,
-        max_items,
-        y_min=None,  # None = autoscaling
-        y_max=None,  # None = autoscaling
-        x=0,
-        y=0,
-        color=0xFFFFFF,  # line color, default is WHITE
-    ):
+        width: int,
+        height: int,
+        max_items: int,
+        y_min: Optional[int] = None,  # None = autoscaling
+        y_max: Optional[int] = None,  # None = autoscaling
+        x: int = 0,
+        y: int = 0,
+        color: int = 0xFFFFFF,  # line color, default is WHITE
+    ) -> None:
 
         # define class instance variables
         self.width = width  # in pixels
@@ -88,14 +92,14 @@ class Sparkline(displayio.Group):
 
         super().__init__(x=x, y=y)  # self is a group of lines
 
-    def clear_values(self):
+    def clear_values(self) -> None:
         """Removes all values from the _spark_list list and removes all lines in the group"""
 
         for _ in range(len(self)):  # remove all items from the current group
             self.pop()
         self._spark_list = []  # empty the list
 
-    def add_value(self, value):
+    def add_value(self, value: float) -> None:
         """Add a value to the sparkline.
         :param value: The value to be added to the sparkline
         """
@@ -111,8 +115,14 @@ class Sparkline(displayio.Group):
     # pylint: disable=no-else-return
     @staticmethod
     def _xintercept(
-        x_1, y_1, x_2, y_2, horizontal_y
-    ):  # finds intercept of the line and a horizontal line at horizontalY
+        x_1: float,
+        y_1: float,
+        x_2: float,
+        y_2: float,
+        horizontal_y: float,
+    ) -> Optional[
+        int
+    ]:  # finds intercept of the line and a horizontal line at horizontalY
         slope = (y_2 - y_1) / (x_2 - x_1)
         b = y_1 - slope * x_1
 
@@ -124,7 +134,15 @@ class Sparkline(displayio.Group):
             ) / slope  # calculate the x-intercept at position y=horizontalY
             return int(xint)
 
-    def _plotline(self, x_1, last_value, x_2, value, y_bottom, y_top):
+    def _plotline(
+        self,
+        x_1: int,
+        last_value: float,
+        x_2: int,
+        value: float,
+        y_bottom: int,
+        y_top: int,
+    ) -> None:
 
         y_2 = int(self.height * (y_top - value) / (y_top - y_bottom))
         y_1 = int(self.height * (y_top - last_value) / (y_top - y_bottom))
@@ -132,7 +150,7 @@ class Sparkline(displayio.Group):
 
     # pylint: disable= too-many-branches, too-many-nested-blocks
 
-    def update(self):
+    def update(self) -> None:
         """Update the drawing of the sparkline."""
 
         # get the y range
@@ -224,7 +242,7 @@ class Sparkline(displayio.Group):
 
                 last_value = value  # store value for the next iteration
 
-    def values(self):
+    def values(self) -> List[float]:
         """Returns the values displayed on the sparkline."""
 
         return self._spark_list

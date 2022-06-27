@@ -21,6 +21,11 @@ Implementation Notes
 
 """
 
+try:
+    from typing import Optional
+except ImportError:
+    pass
+
 import displayio
 
 __version__ = "0.0.0-auto.0"
@@ -43,7 +48,17 @@ class Rect(displayio.TileGrid):
 
     """
 
-    def __init__(self, x, y, width, height, *, fill=None, outline=None, stroke=1):
+    def __init__(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        *,
+        fill: Optional[int] = None,
+        outline: Optional[int] = None,
+        stroke: int = 1,
+    ) -> None:
         self._bitmap = displayio.Bitmap(width, height, 2)
         self._palette = displayio.Palette(2)
 
@@ -67,13 +82,13 @@ class Rect(displayio.TileGrid):
         super().__init__(self._bitmap, pixel_shader=self._palette, x=x, y=y)
 
     @property
-    def fill(self):
+    def fill(self) -> Optional[int]:
         """The fill of the rectangle. Can be a hex value for a color or ``None`` for
         transparent."""
         return self._palette[0]
 
     @fill.setter
-    def fill(self, color):
+    def fill(self, color: Optional[int]) -> None:
         if color is None:
             self._palette[0] = 0
             self._palette.make_transparent(0)
@@ -82,13 +97,13 @@ class Rect(displayio.TileGrid):
             self._palette.make_opaque(0)
 
     @property
-    def outline(self):
+    def outline(self) -> Optional[int]:
         """The outline of the rectangle. Can be a hex value for a color or ``None``
         for no outline."""
         return self._palette[1]
 
     @outline.setter
-    def outline(self, color):
+    def outline(self, color: Optional[int]) -> None:
         if color is None:
             self._palette[1] = 0
             self._palette.make_transparent(1)
