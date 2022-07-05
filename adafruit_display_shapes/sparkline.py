@@ -99,7 +99,7 @@ class Sparkline(displayio.Group):
             self.pop()
         self._spark_list = []  # empty the list
 
-    def add_value(self, value: float, update: boolean = True) -> None:
+    def add_value(self, value: float, update: bool = True) -> None:
         """Add a value to the sparkline.
         :param value: The value to be added to the sparkline
         :param update: trigger recreation of primitives
