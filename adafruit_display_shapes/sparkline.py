@@ -99,9 +99,14 @@ class Sparkline(displayio.Group):
             self.pop()
         self._spark_list = []  # empty the list
 
-    def add_value(self, value: float) -> None:
+    def add_value(self, value: float, update: bool = True) -> None:
         """Add a value to the sparkline.
         :param value: The value to be added to the sparkline
+        :param update: trigger recreation of primitives
+
+        Note: when adding multiple values it is more efficient to call
+        this method with parameter 'update=False' and then to manually
+        call the update()-method
         """
 
         if value is not None:
@@ -110,7 +115,8 @@ class Sparkline(displayio.Group):
             ):  # if list is full, remove the first item
                 self._spark_list.pop(0)
             self._spark_list.append(value)
-            self.update()
+            if update:
+                self.update()
 
     # pylint: disable=no-else-return
     @staticmethod
