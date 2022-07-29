@@ -100,7 +100,7 @@ class Sparkline(displayio.Group):
         self._x = x
         self._y = y
         self._redraw = True  # _redraw: redraw primitives
-        self._last = []      # _last: last point of sparkline
+        self._last = []  # _last: last point of sparkline
 
         super().__init__(x=x, y=y)  # self is a group of lines
 
