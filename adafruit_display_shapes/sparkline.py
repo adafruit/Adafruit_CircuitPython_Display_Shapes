@@ -100,6 +100,7 @@ class Sparkline(displayio.Group):
         self._x = x
         self._y = y
         self._redraw = True  # _redraw: redraw primitives
+        self._last = []      # _last: last point of sparkline
 
         super().__init__(x=x, y=y)  # self is a group of lines
 
@@ -182,7 +183,7 @@ class Sparkline(displayio.Group):
         self.append(Line(x_1, y_1, x_2, y_2, self.color))  # plot the line
         self._last = [x_2, value]
 
-    # pylint: disable= too-many-branches, too-many-nested-blocks
+    # pylint: disable= too-many-branches, too-many-nested-blocks, too-many-locals, too-many-statements
 
     def update(self) -> None:
         """Update the drawing of the sparkline."""
@@ -271,8 +272,6 @@ class Sparkline(displayio.Group):
                                 adj_last_value,
                                 adj_x_2,
                                 adj_value,
-                                self.y_bottom,
-                                self.y_top,
                             )
 
             last_value = value  # store value for the next iteration
