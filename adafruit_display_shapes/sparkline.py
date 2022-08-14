@@ -54,11 +54,17 @@ class Sparkline(displayio.Group):
     :param width: Width of the sparkline graph in pixels
     :param height: Height of the sparkline graph in pixels
     :param max_items: Maximum number of values housed in the sparkline
+    :param dyn_xpitch: dynamically change xpitch (True)
     :param y_min: Lower range for the y-axis.  Set to None for autorange.
     :param y_max: Upper range for the y-axis.  Set to None for autorange.
     :param x: X-position on the screen, in pixels
     :param y: Y-position on the screen, in pixels
     :param color: Line color, the default value is 0xFFFFFF (WHITE)
+
+    Note: If dyn_xpitch is True (default), the sparkline will allways span
+    the complete width. Otherwise, the sparkline will grow when you
+    add values. Once the line has reached the full width, the sparkline
+    will scroll to the left.
     """
 
     def __init__(
@@ -66,6 +72,7 @@ class Sparkline(displayio.Group):
         width: int,
         height: int,
         max_items: int,
+        dyn_xpitch: Optional[bool] = True,  # True = dynamic pitch size
         y_min: Optional[int] = None,  # None = autoscaling
         y_max: Optional[int] = None,  # None = autoscaling
         x: int = 0,
@@ -79,6 +86,9 @@ class Sparkline(displayio.Group):
         self.color = color  #
         self._max_items = max_items  # maximum number of items in the list
         self._spark_list = []  # list containing the values
+        self.dyn_xpitch = dyn_xpitch
+        if not dyn_xpitch:
+            self._xpitch = (width - 1) / (self._max_items - 1)
         self.y_min = y_min  # minimum of y-axis (None: autoscale)
         self.y_max = y_max  # maximum of y-axis (None: autoscale)
         self.y_bottom = y_min
@@ -89,6 +99,8 @@ class Sparkline(displayio.Group):
         # updated if autorange
         self._x = x
         self._y = y
+        self._redraw = True  # _redraw: redraw primitives
+        self._last = []  # _last: last point of sparkline
 
         super().__init__(x=x, y=y)  # self is a group of lines
 
@@ -98,6 +110,7 @@ class Sparkline(displayio.Group):
         for _ in range(len(self)):  # remove all items from the current group
             self.pop()
         self._spark_list = []  # empty the list
+        self._redraw = True
 
     def add_value(self, value: float, update: bool = True) -> None:
         """Add a value to the sparkline.
@@ -115,7 +128,22 @@ class Sparkline(displayio.Group):
                 len(self._spark_list) >= self._max_items
             ):  # if list is full, remove the first item
                 self._spark_list.pop(0)
+                self._redraw = True
             self._spark_list.append(value)
+
+            if self.y_min is None:
+                self._redraw = self._redraw or value < self.y_bottom
+                self.y_bottom = (
+                    value if not self.y_bottom else min(value, self.y_bottom)
+                )
+            if self.y_max is None:
+                self._redraw = self._redraw or value > self.y_top
+                self.y_top = value if not self.y_top else max(value, self.y_top)
+
+            # Guard for y_top and y_bottom being the same
+            if self.y_top == self.y_bottom:
+                self.y_bottom *= 0.99
+
             if update:
                 self.update()
 
@@ -147,107 +175,107 @@ class Sparkline(displayio.Group):
         last_value: float,
         x_2: int,
         value: float,
-        y_bottom: int,
-        y_top: int,
     ) -> None:
 
-        y_2 = int(self.height * (y_top - value) / (y_top - y_bottom))
-        y_1 = int(self.height * (y_top - last_value) / (y_top - y_bottom))
+        y_2 = int(self.height * (self.y_top - value) / (self.y_top - self.y_bottom))
+        y_1 = int(
+            self.height * (self.y_top - last_value) / (self.y_top - self.y_bottom)
+        )
         self.append(Line(x_1, y_1, x_2, y_2, self.color))  # plot the line
+        self._last = [x_2, value]
 
-    # pylint: disable= too-many-branches, too-many-nested-blocks
+    # pylint: disable= too-many-branches, too-many-nested-blocks, too-many-locals, too-many-statements
 
     def update(self) -> None:
         """Update the drawing of the sparkline."""
 
-        # get the y range
-        if self.y_min is None:
-            self.y_bottom = min(self._spark_list)
+        # bail out early if we only have a single point
+        n_points = len(self._spark_list)
+        if n_points < 2:
+            self._last = [0, self._spark_list[0]]
+            return
+
+        if self.dyn_xpitch:
+            # this is a float, only make int when plotting the line
+            xpitch = (self.width - 1) / (n_points - 1)
+            self._redraw = True
         else:
-            self.y_bottom = self.y_min
+            xpitch = self._xpitch
 
-        if self.y_max is None:
-            self.y_top = max(self._spark_list)
-        else:
-            self.y_top = self.y_max
+        # only add new segment if redrawing is not necessary
+        if not self._redraw:
+            # end of last line (last point, read as "x(-1)")
+            x_m1 = self._last[0]
+            y_m1 = self._last[1]
+            # end of new line (new point, read as "x(0)")
+            x_0 = int(x_m1 + xpitch)
+            y_0 = self._spark_list[-1]
+            self._plotline(x_m1, y_m1, x_0, y_0)
+            return
 
-        # Guard for y_top and y_bottom being the same
-        if self.y_top == self.y_bottom:
-            self.y_bottom -= 10
-            self.y_top += 10
+        self._redraw = False  # reset, since we now redraw everything
+        for _ in range(len(self)):  # remove all items from the current group
+            self.pop()
 
-        if len(self._spark_list) > 2:
-            xpitch = (self.width - 1) / (
-                len(self._spark_list) - 1
-            )  # this is a float, only make int when plotting the line
+        for count, value in enumerate(self._spark_list):
+            if count == 0:
+                pass  # don't draw anything for a first point
+            else:
+                x_2 = int(xpitch * count)
+                x_1 = int(xpitch * (count - 1))
 
-            for _ in range(len(self)):  # remove all items from the current group
-                self.pop()
+                if (self.y_bottom <= last_value <= self.y_top) and (
+                    self.y_bottom <= value <= self.y_top
+                ):  # both points are in range, plot the line
+                    self._plotline(x_1, last_value, x_2, value)
 
-            for count, value in enumerate(self._spark_list):
-                if count == 0:
-                    pass  # don't draw anything for a first point
-                else:
-                    x_2 = int(xpitch * count)
-                    x_1 = int(xpitch * (count - 1))
-
-                    if (self.y_bottom <= last_value <= self.y_top) and (
-                        self.y_bottom <= value <= self.y_top
-                    ):  # both points are in range, plot the line
-                        self._plotline(
-                            x_1, last_value, x_2, value, self.y_bottom, self.y_top
-                        )
-
-                    else:  # at least one point is out of range, clip one or both ends the line
-                        if ((last_value > self.y_top) and (value > self.y_top)) or (
-                            (last_value < self.y_bottom) and (value < self.y_bottom)
-                        ):
-                            # both points are on the same side out of range: don't draw anything
+                else:  # at least one point is out of range, clip one or both ends the line
+                    if ((last_value > self.y_top) and (value > self.y_top)) or (
+                        (last_value < self.y_bottom) and (value < self.y_bottom)
+                    ):
+                        # both points are on the same side out of range: don't draw anything
+                        pass
+                    else:
+                        xint_bottom = self._xintercept(
+                            x_1, last_value, x_2, value, self.y_bottom
+                        )  # get possible new x intercept points
+                        xint_top = self._xintercept(
+                            x_1, last_value, x_2, value, self.y_top
+                        )  # on the top and bottom of range
+                        if (xint_bottom is None) or (
+                            xint_top is None
+                        ):  # out of range doublecheck
                             pass
                         else:
-                            xint_bottom = self._xintercept(
-                                x_1, last_value, x_2, value, self.y_bottom
-                            )  # get possible new x intercept points
-                            xint_top = self._xintercept(
-                                x_1, last_value, x_2, value, self.y_top
-                            )  # on the top and bottom of range
+                            # Initialize the adjusted values as the baseline
+                            adj_x_1 = x_1
+                            adj_last_value = last_value
+                            adj_x_2 = x_2
+                            adj_value = value
 
-                            if (xint_bottom is None) or (
-                                xint_top is None
-                            ):  # out of range doublecheck
-                                pass
-                            else:
-                                # Initialize the adjusted values as the baseline
-                                adj_x_1 = x_1
-                                adj_last_value = last_value
-                                adj_x_2 = x_2
-                                adj_value = value
+                            if value > last_value:  # slope is positive
+                                if xint_bottom >= x_1:  # bottom is clipped
+                                    adj_x_1 = xint_bottom
+                                    adj_last_value = self.y_bottom  # y_1
+                                if xint_top <= x_2:  # top is clipped
+                                    adj_x_2 = xint_top
+                                    adj_value = self.y_top  # y_2
+                            else:  # slope is negative
+                                if xint_top >= x_1:  # top is clipped
+                                    adj_x_1 = xint_top
+                                    adj_last_value = self.y_top  # y_1
+                                if xint_bottom <= x_2:  # bottom is clipped
+                                    adj_x_2 = xint_bottom
+                                    adj_value = self.y_bottom  # y_2
 
-                                if value > last_value:  # slope is positive
-                                    if xint_bottom >= x_1:  # bottom is clipped
-                                        adj_x_1 = xint_bottom
-                                        adj_last_value = self.y_bottom  # y_1
-                                    if xint_top <= x_2:  # top is clipped
-                                        adj_x_2 = xint_top
-                                        adj_value = self.y_top  # y_2
-                                else:  # slope is negative
-                                    if xint_top >= x_1:  # top is clipped
-                                        adj_x_1 = xint_top
-                                        adj_last_value = self.y_top  # y_1
-                                    if xint_bottom <= x_2:  # bottom is clipped
-                                        adj_x_2 = xint_bottom
-                                        adj_value = self.y_bottom  # y_2
+                            self._plotline(
+                                adj_x_1,
+                                adj_last_value,
+                                adj_x_2,
+                                adj_value,
+                            )
 
-                                self._plotline(
-                                    adj_x_1,
-                                    adj_last_value,
-                                    adj_x_2,
-                                    adj_value,
-                                    self.y_bottom,
-                                    self.y_top,
-                                )
-
-                last_value = value  # store value for the next iteration
+            last_value = value  # store value for the next iteration
 
     def values(self) -> List[float]:
         """Returns the values displayed on the sparkline."""
