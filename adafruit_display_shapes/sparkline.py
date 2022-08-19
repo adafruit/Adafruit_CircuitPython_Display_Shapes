@@ -145,10 +145,6 @@ class Sparkline(displayio.Group):
                 self._redraw = self._redraw or value > self.y_top
                 self.y_top = value if not self.y_top else max(value, self.y_top)
 
-            # Guard for y_top and y_bottom being the same
-            if self.y_top == self.y_bottom:
-                self.y_bottom *= 0.99
-
             if update:
                 self.update()
 
@@ -182,10 +178,15 @@ class Sparkline(displayio.Group):
         value: float,
     ) -> None:
 
-        y_2 = int(self.height * (self.y_top - value) / (self.y_top - self.y_bottom))
-        y_1 = int(
-            self.height * (self.y_top - last_value) / (self.y_top - self.y_bottom)
-        )
+        # Guard for y_top and y_bottom being the same
+        if self.y_top == self.y_bottom:
+            y_2 = int(0.5 * self.height)
+            y_1 = int(0.5 * self.height)
+        else:
+            y_2 = int(self.height * (self.y_top - value) / (self.y_top - self.y_bottom))
+            y_1 = int(
+                self.height * (self.y_top - last_value) / (self.y_top - self.y_bottom)
+            )
         self.append(Line(x_1, y_1, x_2, y_2, self.color))  # plot the line
         self._last = [x_2, value]
 
