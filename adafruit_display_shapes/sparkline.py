@@ -127,7 +127,12 @@ class Sparkline(displayio.Group):
             if (
                 len(self._spark_list) >= self._max_items
             ):  # if list is full, remove the first item
-                self._spark_list.pop(0)
+                first = self._spark_list.pop(0)
+                # check if boundaries have to be updated
+                if self.y_min is None and first == self.y_bottom:
+                    self.y_bottom = min(self._spark_list)
+                if self.y_max is None and first == self.y_top:
+                    self.y_top = max(self._spark_list)
                 self._redraw = True
             self._spark_list.append(value)
 
