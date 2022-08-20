@@ -97,8 +97,6 @@ class Sparkline(displayio.Group):
         self.y_top = y_max
         # y_top: The actual minimum value of the vertical scale, will be
         # updated if autorange
-        self._x = x
-        self._y = y
         self._redraw = True  # _redraw: redraw primitives
         self._last = []  # _last: last point of sparkline
 
