@@ -97,8 +97,6 @@ class Sparkline(displayio.Group):
         self.y_top = y_max
         # y_top: The actual minimum value of the vertical scale, will be
         # updated if autorange
-        self._x = x
-        self._y = y
         self._redraw = True  # _redraw: redraw primitives
         self._last = []  # _last: last point of sparkline
 
@@ -127,7 +125,12 @@ class Sparkline(displayio.Group):
             if (
                 len(self._spark_list) >= self._max_items
             ):  # if list is full, remove the first item
-                self._spark_list.pop(0)
+                first = self._spark_list.pop(0)
+                # check if boundaries have to be updated
+                if self.y_min is None and first == self.y_bottom:
+                    self.y_bottom = min(self._spark_list)
+                if self.y_max is None and first == self.y_top:
+                    self.y_top = max(self._spark_list)
                 self._redraw = True
             self._spark_list.append(value)
 
@@ -139,10 +142,6 @@ class Sparkline(displayio.Group):
             if self.y_max is None:
                 self._redraw = self._redraw or value > self.y_top
                 self.y_top = value if not self.y_top else max(value, self.y_top)
-
-            # Guard for y_top and y_bottom being the same
-            if self.y_top == self.y_bottom:
-                self.y_bottom *= 0.99
 
             if update:
                 self.update()
@@ -177,10 +176,15 @@ class Sparkline(displayio.Group):
         value: float,
     ) -> None:
 
-        y_2 = int(self.height * (self.y_top - value) / (self.y_top - self.y_bottom))
-        y_1 = int(
-            self.height * (self.y_top - last_value) / (self.y_top - self.y_bottom)
-        )
+        # Guard for y_top and y_bottom being the same
+        if self.y_top == self.y_bottom:
+            y_2 = int(0.5 * self.height)
+            y_1 = int(0.5 * self.height)
+        else:
+            y_2 = int(self.height * (self.y_top - value) / (self.y_top - self.y_bottom))
+            y_1 = int(
+                self.height * (self.y_top - last_value) / (self.y_top - self.y_bottom)
+            )
         self.append(Line(x_1, y_1, x_2, y_2, self.color))  # plot the line
         self._last = [x_2, value]
 
