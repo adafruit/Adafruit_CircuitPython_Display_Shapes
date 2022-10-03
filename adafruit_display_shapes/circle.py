@@ -36,14 +36,14 @@ class Circle(RoundRect):
     # pylint: disable=too-few-public-methods, invalid-name
     """A circle.
 
-    :param x0: The x-position of the center.
-    :param y0: The y-position of the center.
-    :param r: The radius of the circle.
-    :param fill: The color to fill the circle. Can be a hex value for a color or
+    :param int x0: The x-position of the center.
+    :param int y0: The y-position of the center.
+    :param int r: The radius of the circle.
+    :param int fill: (Optional) The color to fill the circle. Can be a hex value for a color or
                  ``None`` for transparent.
-    :param outline: The outline of the circle. Can be a hex value for a color or
+    :param int outline: (Optional) The outline of the circle. Can be a hex value for a color or
                  ``None`` for no outline.
-    :param stroke: Used for the outline. Will not change the radius.
+    :param int stroke: Used for the outline. Will not change the radius.
 
     """
 

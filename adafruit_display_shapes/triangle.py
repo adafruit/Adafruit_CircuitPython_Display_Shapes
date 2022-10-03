@@ -36,15 +36,15 @@ class Triangle(Polygon):
     # pylint: disable=too-many-arguments,invalid-name
     """A triangle.
 
-    :param x0: The x-position of the first vertex.
-    :param y0: The y-position of the first vertex.
-    :param x1: The x-position of the second vertex.
-    :param y1: The y-position of the second vertex.
-    :param x2: The x-position of the third vertex.
-    :param y2: The y-position of the third vertex.
-    :param fill: The color to fill the triangle. Can be a hex value for a color or
-                 ``None`` for transparent.
-    :param outline: The outline of the triangle. Can be a hex value for a color or
+    :param int x0: The x-position of the first vertex.
+    :param int y0: The y-position of the first vertex.
+    :param int x1: The x-position of the second vertex.
+    :param int y1: The y-position of the second vertex.
+    :param int x2: The x-position of the third vertex.
+    :param int y2: The y-position of the third vertex.
+    :param int fill: (Optional) The color to fill the triangle. Can be a hex value for a color or
+                    ``None`` for transparent.
+    :param int outline: (Optional) The outline of the triangle. Can be a hex value for a color or
                     ``None`` for no outline.
     """
     # pylint: disable=too-many-locals

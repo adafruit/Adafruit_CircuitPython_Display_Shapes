@@ -36,8 +36,8 @@ class Polygon(displayio.TileGrid):
     # pylint: disable=too-many-arguments,invalid-name
     """A polygon.
 
-    :param points: A list of (x, y) tuples of the points
-    :param outline: The outline of the polygon. Can be a hex value for a color or
+    :param list points: A list of (x, y) tuples of the points
+    :param int outline: (Optional) The outline of the polygon. Can be a hex value for a color or
                     ``None`` for no outline.
     """
 
