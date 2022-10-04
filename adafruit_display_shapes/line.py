@@ -36,11 +36,11 @@ class Line(Polygon):
     # pylint: disable=too-many-arguments,invalid-name, too-few-public-methods
     """A line.
 
-    :param x0: The x-position of the first vertex.
-    :param y0: The y-position of the first vertex.
-    :param x1: The x-position of the second vertex.
-    :param y1: The y-position of the second vertex.
-    :param color: The color of the line.
+    :param int x0: The x-position of the first vertex.
+    :param int y0: The y-position of the first vertex.
+    :param int x1: The x-position of the second vertex.
+    :param int y1: The y-position of the second vertex.
+    :param int color: The color of the line.
     """
 
     def __init__(

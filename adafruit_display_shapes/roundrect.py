@@ -26,17 +26,17 @@ class RoundRect(displayio.TileGrid):
     # pylint: disable=too-many-arguments
     """A round-corner rectangle.
 
-    :param x: The x-position of the top left corner.
-    :param y: The y-position of the top left corner.
-    :param width: The width of the rounded-corner rectangle.
-    :param height: The height of the rounded-corner rectangle.
-    :param r: The radius of the rounded corner.
-    :param fill: The color to fill the rounded-corner rectangle. Can be a hex value for a color or
-                 ``None`` for transparent.
-    :param outline: The outline of the rounded-corner rectangle. Can be a hex value for a color or
-                    ``None`` for no outline.
-    :param stroke: Used for the outline. Will not change the outer bound size set by ``width`` and
-                   ``height``.
+    :param int x: The x-position of the top left corner.
+    :param int y: The y-position of the top left corner.
+    :param int width: The width of the rounded-corner rectangle.
+    :param int height: The height of the rounded-corner rectangle.
+    :param int r: The radius of the rounded corner.
+    :param int|None fill: The color to fill the rounded-corner rectangle. Can be a hex value
+                    for a color or ``None`` for transparent.
+    :param int|None outline: The outline of the rounded-corner rectangle. Can be a hex value
+                    for a color or ``None`` for no outline.
+    :param int stroke: Used for the outline. Will not change the outer bound size set by ``width``
+                    and ``height``.
 
     """
 
