@@ -31,9 +31,9 @@ class RoundRect(displayio.TileGrid):
     :param int width: The width of the rounded-corner rectangle.
     :param int height: The height of the rounded-corner rectangle.
     :param int r: The radius of the rounded corner.
-    :param int fill: (Optional) The color to fill the rounded-corner rectangle. Can be a hex value
+    :param int|None fill: The color to fill the rounded-corner rectangle. Can be a hex value
                     for a color or ``None`` for transparent.
-    :param int outline: (Optional) The outline of the rounded-corner rectangle. Can be a hex value
+    :param int|None outline: The outline of the rounded-corner rectangle. Can be a hex value
                     for a color or ``None`` for no outline.
     :param int stroke: Used for the outline. Will not change the outer bound size set by ``width``
                     and ``height``.

@@ -42,9 +42,9 @@ class Triangle(Polygon):
     :param int y1: The y-position of the second vertex.
     :param int x2: The x-position of the third vertex.
     :param int y2: The y-position of the third vertex.
-    :param int fill: (Optional) The color to fill the triangle. Can be a hex value for a color or
+    :param int|None fill: The color to fill the triangle. Can be a hex value for a color or
                     ``None`` for transparent.
-    :param int outline: (Optional) The outline of the triangle. Can be a hex value for a color or
+    :param int|None outline: The outline of the triangle. Can be a hex value for a color or
                     ``None`` for no outline.
     """
     # pylint: disable=too-many-locals

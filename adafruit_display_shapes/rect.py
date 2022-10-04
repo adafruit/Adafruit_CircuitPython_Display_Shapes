@@ -39,9 +39,9 @@ class Rect(displayio.TileGrid):
     :param int y: The y-position of the top left corner.
     :param int width: The width of the rectangle.
     :param int height: The height of the rectangle.
-    :param int fill: (Optional) The color to fill the rectangle. Can be a hex value for a color or
+    :param int|None fill: The color to fill the rectangle. Can be a hex value for a color or
                     ``None`` for transparent.
-    :param int outline: (Optional) The outline of the rectangle. Can be a hex value for a color or
+    :param int|None outline: The outline of the rectangle. Can be a hex value for a color or
                     ``None`` for no outline.
     :param int stroke: Used for the outline. Will not change the outer bound size set by ``width``
                     and ``height``.

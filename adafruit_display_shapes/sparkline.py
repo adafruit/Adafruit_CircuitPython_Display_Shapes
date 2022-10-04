@@ -55,8 +55,8 @@ class Sparkline(displayio.Group):
     :param int height: Height of the sparkline graph in pixels
     :param int max_items: Maximum number of values housed in the sparkline
     :param bool dyn_xpitch: (Optional) Dynamically change xpitch (True)
-    :param int y_min: (Optional) Lower range for the y-axis.  Set to None for autorange.
-    :param int y_max: (Optional) Upper range for the y-axis.  Set to None for autorange.
+    :param int|None y_min: Lower range for the y-axis.  Set to None for autorange.
+    :param int|None y_max: Upper range for the y-axis.  Set to None for autorange.
     :param int x: X-position on the screen, in pixels
     :param int y: Y-position on the screen, in pixels
     :param int color: Line color, the default value is 0xFFFFFF (WHITE)
