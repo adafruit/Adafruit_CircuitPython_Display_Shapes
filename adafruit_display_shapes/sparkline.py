@@ -54,12 +54,20 @@ class _CyclicBuffer():
         self._end = 0 # between 0 and 2*size-1
         
     def push(self, value: float) -> None:
+        """Pushes value at the end of the buffer.
+
+        :param float value: value to be pushed
+
+        """
+        
         if self.len() == len(self._buffer):
             raise RuntimeError("Trying to push to full buffer")
         self._buffer[self._end % len(self._buffer)] = value
         self._end += 1
         
     def pop(self) -> float:
+        """Pop value from the start of the buffer and returns it."""
+        
         if self.len() == 0:
             raise RuntimeError("Trying to pop from empty buffer")
         result = self._buffer[self._start]
@@ -70,21 +78,26 @@ class _CyclicBuffer():
         return result
         
     def len(self) -> int:
+        """Returns count of valid data in the buffer."""
+        
         return self._end - self._start
     
     def clear(self) -> None:
+        """Marks all data as invalid."""
+        
         self._start = 0
         self._end = 0
         
     def values(self) -> List[float]:
+        """Returns valid data from the buffer."""
+        
         if self.len() == 0:
             return []
         start = self._start
         end = self._end % len(self._buffer)
         if start < end:
             return self._buffer[start:end]
-        else:
-            return self._buffer[start:] + self._buffer[:end]
+        return self._buffer[start:] + self._buffer[:end]
 
 
 class Sparkline(displayio.Group):
