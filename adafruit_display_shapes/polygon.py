@@ -9,7 +9,7 @@
 Various common shapes for use with displayio - Polygon shape!
 
 
-* Author(s): Melissa LeBlanc-Williams, Maciej Sokołowski
+* Author(s): Melissa LeBlanc-Williams
 
 Implementation Notes
 --------------------
