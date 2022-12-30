@@ -39,7 +39,7 @@ class Polygon(displayio.TileGrid):
     :param list points: A list of (x, y) tuples of the points
     :param int|None outline: The outline of the polygon. Can be a hex value for a color or
                     ``None`` for no outline.
-    :param bool close: Wether to connect first and last point.
+    :param bool close: (Optional) Wether to connect first and last point. (True)
     """
 
     def __init__(
@@ -47,7 +47,7 @@ class Polygon(displayio.TileGrid):
         points: List[Tuple[int, int]],
         *,
         outline: Optional[int] = None,
-        close: bool = True,
+        close: Optional[bool] = True,
     ) -> None:
         if close:
             points.append(points[0])
