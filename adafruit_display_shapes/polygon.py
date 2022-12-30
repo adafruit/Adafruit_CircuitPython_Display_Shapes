@@ -9,7 +9,7 @@
 Various common shapes for use with displayio - Polygon shape!
 
 
-* Author(s): Melissa LeBlanc-Williams
+* Author(s): Melissa LeBlanc-Williams, Maciej Sokołowski
 
 Implementation Notes
 --------------------
@@ -39,6 +39,7 @@ class Polygon(displayio.TileGrid):
     :param list points: A list of (x, y) tuples of the points
     :param int|None outline: The outline of the polygon. Can be a hex value for a color or
                     ``None`` for no outline.
+    :param bool close: Wether to connect first and last point.
     """
 
     def __init__(
@@ -46,7 +47,11 @@ class Polygon(displayio.TileGrid):
         points: List[Tuple[int, int]],
         *,
         outline: Optional[int] = None,
+        close: bool = True,
     ) -> None:
+        if close:
+            points.append(points[0])
+
         xs = []
         ys = []
 
@@ -68,12 +73,9 @@ class Polygon(displayio.TileGrid):
         if outline is not None:
             # print("outline")
             self.outline = outline
-            for index, _ in enumerate(points):
+            for index, _ in enumerate(points[:-1]):
                 point_a = points[index]
-                if index == len(points) - 1:
-                    point_b = points[0]
-                else:
-                    point_b = points[index + 1]
+                point_b = points[index + 1]
                 self._line(
                     point_a[0] - x_offset,
                     point_a[1] - y_offset,
