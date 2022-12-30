@@ -25,7 +25,7 @@
 Various common shapes for use with displayio - Sparkline!
 
 
-* Author(s): Kevin Matocha
+* Author(s): Kevin Matocha, Maciej Sokołowski
 
 Implementation Notes
 --------------------
@@ -45,6 +45,56 @@ except ImportError:
     pass
 import displayio
 from adafruit_display_shapes.line import Line
+
+
+class _CyclicBuffer():
+    def __init__(self, size: int) -> None:
+        self._buffer = [None] * size
+        self._start = 0 # between 0 and size-1
+        self._end = 0 # between 0 and 2*size-1
+        
+    def push(self, value: float) -> None:
+        if self.len() == len(self._buffer):
+            raise RuntimeError("Trying to push to full buffer")
+        self._buffer[self._end % len(self._buffer)] = value
+        self._end += 1
+        
+    def pop(self) -> float:
+        if self.len() == 0:
+            raise RuntimeError("Trying to pop from empty buffer")
+        result = self.first()
+        self._start += 1
+        if self._start == len(self._buffer):
+            self._start -= len(self._buffer)
+            self._end -= len(self._buffer)
+        return result
+        
+    def first(self) -> float:
+        if self.len() == 0:
+            return None
+        return self._buffer[self._start]
+        
+    def last(self) -> float:
+        if self.len() == 0:
+            return None
+        return self._buffer[(self._end - 1) % len(self._buffer)]
+        
+    def len(self) -> int:
+        return self._end - self._start
+    
+    def clear(self) -> None:
+        self._start = 0
+        self._end = 0
+        
+    def values(self) -> List[float]:
+        if self.len() == 0:
+            return []
+        start = self._start
+        end = self._end % len(self._buffer)
+        if start < end:
+            return self._buffer[start:end]
+        else:
+            return self._buffer[start:] + self._buffer[:end]
 
 
 class Sparkline(displayio.Group):
@@ -85,7 +135,7 @@ class Sparkline(displayio.Group):
         self.height = height  # in pixels
         self.color = color  #
         self._max_items = max_items  # maximum number of items in the list
-        self._spark_list = []  # list containing the values
+        self._buffer = _CyclicBuffer(self._max_items)
         self.dyn_xpitch = dyn_xpitch
         if not dyn_xpitch:
             self._xpitch = (width - 1) / (self._max_items - 1)
@@ -103,11 +153,11 @@ class Sparkline(displayio.Group):
         super().__init__(x=x, y=y)  # self is a group of lines
 
     def clear_values(self) -> None:
-        """Removes all values from the _spark_list list and removes all lines in the group"""
+        """Clears _buffer and removes all lines in the group"""
 
         for _ in range(len(self)):  # remove all items from the current group
             self.pop()
-        self._spark_list = []  # empty the list
+        self._buffer.clear()
         self._redraw = True
 
     def add_value(self, value: float, update: bool = True) -> None:
@@ -123,16 +173,16 @@ class Sparkline(displayio.Group):
 
         if value is not None:
             if (
-                len(self._spark_list) >= self._max_items
+                self._buffer.len() >= self._max_items
             ):  # if list is full, remove the first item
-                first = self._spark_list.pop(0)
+                first = self._buffer.pop()
                 # check if boundaries have to be updated
                 if self.y_min is None and first == self.y_bottom:
-                    self.y_bottom = min(self._spark_list)
+                    self.y_bottom = min(self._buffer.values())
                 if self.y_max is None and first == self.y_top:
-                    self.y_top = max(self._spark_list)
+                    self.y_top = max(self._buffer.values())
                 self._redraw = True
-            self._spark_list.append(value)
+            self._buffer.push(value)
 
             if self.y_min is None:
                 self._redraw = self._redraw or value < self.y_bottom
@@ -194,9 +244,9 @@ class Sparkline(displayio.Group):
         """Update the drawing of the sparkline."""
 
         # bail out early if we only have a single point
-        n_points = len(self._spark_list)
+        n_points = self._buffer.len()
         if n_points < 2:
-            self._last = [0, self._spark_list[0]]
+            self._last = [0, self._buffer.first()]
             return
 
         if self.dyn_xpitch:
@@ -213,7 +263,7 @@ class Sparkline(displayio.Group):
             y_m1 = self._last[1]
             # end of new line (new point, read as "x(0)")
             x_0 = int(x_m1 + xpitch)
-            y_0 = self._spark_list[-1]
+            y_0 = self._buffer.last()
             self._plotline(x_m1, y_m1, x_0, y_0)
             return
 
@@ -221,7 +271,7 @@ class Sparkline(displayio.Group):
         for _ in range(len(self)):  # remove all items from the current group
             self.pop()
 
-        for count, value in enumerate(self._spark_list):
+        for count, value in enumerate(self._buffer.values()):
             if count == 0:
                 pass  # don't draw anything for a first point
             else:
@@ -284,4 +334,4 @@ class Sparkline(displayio.Group):
     def values(self) -> List[float]:
         """Returns the values displayed on the sparkline."""
 
-        return self._spark_list
+        return self._buffer.values()
