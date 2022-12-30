@@ -47,27 +47,27 @@ import displayio
 from adafruit_display_shapes.polygon import Polygon
 
 
-class _CyclicBuffer():
+class _CyclicBuffer:
     def __init__(self, size: int) -> None:
         self._buffer = [None] * size
-        self._start = 0 # between 0 and size-1
-        self._end = 0 # between 0 and 2*size-1
-        
+        self._start = 0  # between 0 and size-1
+        self._end = 0  # between 0 and 2*size-1
+
     def push(self, value: float) -> None:
         """Pushes value at the end of the buffer.
 
         :param float value: value to be pushed
 
         """
-        
+
         if self.len() == len(self._buffer):
             raise RuntimeError("Trying to push to full buffer")
         self._buffer[self._end % len(self._buffer)] = value
         self._end += 1
-        
+
     def pop(self) -> float:
         """Pop value from the start of the buffer and returns it."""
-        
+
         if self.len() == 0:
             raise RuntimeError("Trying to pop from empty buffer")
         result = self._buffer[self._start]
@@ -76,21 +76,21 @@ class _CyclicBuffer():
             self._start -= len(self._buffer)
             self._end -= len(self._buffer)
         return result
-        
+
     def len(self) -> int:
         """Returns count of valid data in the buffer."""
-        
+
         return self._end - self._start
-    
+
     def clear(self) -> None:
         """Marks all data as invalid."""
-        
+
         self._start = 0
         self._end = 0
-        
+
     def values(self) -> List[float]:
         """Returns valid data from the buffer."""
-        
+
         if self.len() == 0:
             return []
         start = self._start
@@ -153,7 +153,7 @@ class Sparkline(displayio.Group):
         self._points = []  # _points: all points of sparkline
 
         super().__init__(x=x, y=y)  # self is a group of single Polygon
-                                    # (TODO: it has one element, maybe group is no longer needed?)
+        # (TODO: it has one element, maybe group is no longer needed?)
 
     def clear_values(self) -> None:
         """Clears _buffer and removes all lines in the group"""
@@ -229,11 +229,13 @@ class Sparkline(displayio.Group):
         else:
             y = int(self.height * (self.y_top - value) / (self.y_top - self.y_bottom))
         self._points.append((x, y))
-        
+
     def _draw(self) -> None:
-        while(len(self)):
+        while len(self):
             self.pop()
-        self.append(Polygon(self._points, outline=self.color, close=False))  # plot the polyline
+        self.append(
+            Polygon(self._points, outline=self.color, close=False)
+        )  # plot the polyline
 
     # pylint: disable= too-many-branches, too-many-nested-blocks, too-many-locals, too-many-statements
 
@@ -299,7 +301,7 @@ class Sparkline(displayio.Group):
                             self._add_point(adj_x, adj_value)
 
             last_value = value  # store value for the next iteration
-        
+
         self._draw()
 
     def values(self) -> List[float]:
