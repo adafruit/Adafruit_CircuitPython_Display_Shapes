@@ -100,7 +100,7 @@ class _CyclicBuffer:
         return self._buffer[start:] + self._buffer[:end]
 
 
-class Sparkline(displayio.Group):
+class Sparkline(displayio.TileGrid):
     # pylint: disable=too-many-arguments
     """A sparkline graph.
 
@@ -120,6 +120,8 @@ class Sparkline(displayio.Group):
     will scroll to the left.
     """
 
+    _LINE_COLOR = 1
+
     def __init__(
         self,
         width: int,
@@ -132,11 +134,7 @@ class Sparkline(displayio.Group):
         y: int = 0,
         color: int = 0xFFFFFF,  # line color, default is WHITE
     ) -> None:
-
         # define class instance variables
-        self.width = width  # in pixels
-        self.height = height  # in pixels
-        self.color = color  #
         self._max_items = max_items  # maximum number of items in the list
         self._buffer = _CyclicBuffer(self._max_items)
         self.dyn_xpitch = dyn_xpitch
@@ -151,15 +149,17 @@ class Sparkline(displayio.Group):
         # y_top: The actual minimum value of the vertical scale, will be
         # updated if autorange
         self._points = []  # _points: all points of sparkline
+        colors = 2
+        self._palette = displayio.Palette(colors + 1)
+        self._palette.make_transparent(0)
+        self._palette[self._LINE_COLOR] = color
+        self._bitmap = displayio.Bitmap(width, height, colors + 1)
 
-        super().__init__(x=x, y=y)  # self is a group of single Polygon
-        # (TODO: it has one element, maybe group is no longer needed?)
+        super().__init__(self._bitmap, pixel_shader=self._palette, x=x, y=y)
 
     def clear_values(self) -> None:
         """Clears _buffer and removes all lines in the group"""
-
-        for _ in range(len(self)):  # remove all items from the current group
-            self.pop()
+        self._bitmap.fill(0)
         self._buffer.clear()
 
     def add_value(self, value: float, update: bool = True) -> None:
@@ -222,20 +222,18 @@ class Sparkline(displayio.Group):
         x: int,
         value: float,
     ) -> None:
-
         # Guard for y_top and y_bottom being the same
         if self.y_top == self.y_bottom:
             y = int(0.5 * self.height)
         else:
-            y = int(self.height * (self.y_top - value) / (self.y_top - self.y_bottom))
+            y = int(
+                (self.height - 1) * (self.y_top - value) / (self.y_top - self.y_bottom)
+            )
         self._points.append((x, y))
 
     def _draw(self) -> None:
-        while len(self):
-            self.pop()
-        self.append(
-            Polygon(self._points, outline=self.color, close=False)
-        )  # plot the polyline
+        self._bitmap.fill(0)
+        Polygon.draw(self._bitmap, self._points, self._LINE_COLOR, close=False)
 
     # pylint: disable= too-many-branches, too-many-nested-blocks, too-many-locals, too-many-statements
 
@@ -308,3 +306,17 @@ class Sparkline(displayio.Group):
         """Returns the values displayed on the sparkline."""
 
         return self._buffer.values()
+
+    @property
+    def width(self) -> int:
+        """
+        :return: the width of the graph in pixels
+        """
+        return self._bitmap.width
+
+    @property
+    def height(self) -> int:
+        """
+        :return: the height of the graph in pixels
+        """
+        return self._bitmap.height
