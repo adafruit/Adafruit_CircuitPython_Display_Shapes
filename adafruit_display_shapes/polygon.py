@@ -31,7 +31,6 @@ import displayio
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.git"
 
-_OUTLINE_COLOR_INDEX = 1
 
 class Polygon(displayio.TileGrid):
     # pylint: disable=too-many-arguments,invalid-name
@@ -41,7 +40,13 @@ class Polygon(displayio.TileGrid):
     :param int|None outline: The outline of the polygon. Can be a hex value for a color or
                     ``None`` for no outline.
     :param bool close: (Optional) Wether to connect first and last point. (True)
+    :param int colors: (Optional) Number of colors to use. Most polygons would use two, one for
+                    outline and one for fill. If you're not filling your polygon, set this to 1
+                    for smaller memory footprint. (2)
     """
+
+    _OUTLINE = 1
+    _FILL = 2
 
     def __init__(
         self,
@@ -49,6 +54,7 @@ class Polygon(displayio.TileGrid):
         *,
         outline: Optional[int] = None,
         close: Optional[bool] = True,
+        colors: Optional[int] = 2,
     ) -> None:
         if close:
             points.append(points[0])
@@ -67,7 +73,7 @@ class Polygon(displayio.TileGrid):
         width = max(xs) - min(xs) + 1
         height = max(ys) - min(ys) + 1
 
-        self._palette = displayio.Palette(2)
+        self._palette = displayio.Palette(colors + 1)
         self._palette.make_transparent(0)
         self._bitmap = displayio.Bitmap(width, height, 2)
 
@@ -82,6 +88,7 @@ class Polygon(displayio.TileGrid):
                     point_a[1] - y_offset,
                     point_b[0] - x_offset,
                     point_b[1] - y_offset,
+                    self._OUTLINE,
                 )
 
         super().__init__(
@@ -95,17 +102,18 @@ class Polygon(displayio.TileGrid):
         y0: int,
         x1: int,
         y1: int,
+        color: int,
     ) -> None:
         if x0 == x1:
             if y0 > y1:
                 y0, y1 = y1, y0
             for _h in range(y0, y1 + 1):
-                self._bitmap[x0, _h] = _OUTLINE_COLOR_INDEX
+                self._bitmap[x0, _h] = color
         elif y0 == y1:
             if x0 > x1:
                 x0, x1 = x1, x0
             for _w in range(x0, x1 + 1):
-                self._bitmap[_w, y0] = _OUTLINE_COLOR_INDEX
+                self._bitmap[_w, y0] = color
         else:
             steep = abs(y1 - y0) > abs(x1 - x0)
             if steep:
@@ -128,9 +136,9 @@ class Polygon(displayio.TileGrid):
 
             for x in range(x0, x1 + 1):
                 if steep:
-                    self._bitmap[y0, x] = _OUTLINE_COLOR_INDEX
+                    self._bitmap[y0, x] = color
                 else:
-                    self._bitmap[x, y0] = _OUTLINE_COLOR_INDEX
+                    self._bitmap[x, y0] = color
                 err -= dy
                 if err < 0:
                     y0 += ystep
@@ -142,13 +150,13 @@ class Polygon(displayio.TileGrid):
     def outline(self) -> Optional[int]:
         """The outline of the polygon. Can be a hex value for a color or
         ``None`` for no outline."""
-        return self._palette[_OUTLINE_COLOR_INDEX]
+        return self._palette[self._OUTLINE]
 
     @outline.setter
     def outline(self, color: Optional[int]) -> None:
         if color is None:
-            self._palette[_OUTLINE_COLOR_INDEX] = 0
-            self._palette.make_transparent(_OUTLINE_COLOR_INDEX)
+            self._palette[self._OUTLINE] = 0
+            self._palette.make_transparent(self._OUTLINE)
         else:
-            self._palette[_OUTLINE_COLOR_INDEX] = color
-            self._palette.make_opaque(_OUTLINE_COLOR_INDEX)
+            self._palette[self._OUTLINE] = color
+            self._palette.make_opaque(self._OUTLINE)
