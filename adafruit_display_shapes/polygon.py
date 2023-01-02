@@ -75,7 +75,7 @@ class Polygon(displayio.TileGrid):
 
         self._palette = displayio.Palette(colors + 1)
         self._palette.make_transparent(0)
-        self._bitmap = displayio.Bitmap(width, height, 2)
+        self._bitmap = displayio.Bitmap(width, height, colors + 1)
 
         if outline is not None:
             # print("outline")
