@@ -33,7 +33,6 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.gi
 
 
 class Polygon(displayio.TileGrid):
-    # pylint: disable=too-many-arguments,invalid-name
     """A polygon.
 
     :param list points: A list of (x, y) tuples of the points
@@ -56,15 +55,7 @@ class Polygon(displayio.TileGrid):
         close: Optional[bool] = True,
         colors: Optional[int] = 2,
     ) -> None:
-        if close:
-            points.append(points[0])
-
-        xs = []
-        ys = []
-
-        for point in points:
-            xs.append(point[0])
-            ys.append(point[1])
+        (xs, ys) = zip(*points)
 
         x_offset = min(xs)
         y_offset = min(ys)
@@ -77,25 +68,37 @@ class Polygon(displayio.TileGrid):
         self._palette.make_transparent(0)
         self._bitmap = displayio.Bitmap(width, height, colors + 1)
 
+        shifted = [(x - x_offset, y - y_offset) for (x, y) in points]
+
         if outline is not None:
-            # print("outline")
             self.outline = outline
-            for index, _ in enumerate(points[:-1]):
-                point_a = points[index]
-                point_b = points[index + 1]
-                self._line(
-                    point_a[0] - x_offset,
-                    point_a[1] - y_offset,
-                    point_b[0] - x_offset,
-                    point_b[1] - y_offset,
-                    self._OUTLINE,
-                )
+            self.draw(self._bitmap, shifted, self._OUTLINE, close)
 
         super().__init__(
             self._bitmap, pixel_shader=self._palette, x=x_offset, y=y_offset
         )
 
-    # pylint: disable=invalid-name, too-many-locals, too-many-branches
+    @staticmethod
+    def draw(
+        bitmap: displayio.Bitmap,
+        points: List[Tuple[int, int]],
+        color_id: int,
+        close: Optional[bool] = True,
+    ) -> None:
+        """Draw a polygon conecting points on provided bitmap with provided color_id
+
+        :param displayio.Bitmap bitmap: bitmap to draw on
+        :param list points: A list of (x, y) tuples of the points
+        :param int color_id: Color to draw with
+        :param bool close: (Optional) Wether to connect first and last point. (True)
+        """
+
+        if close:
+            points.append(points[0])
+
+        for index in range(len(points) - 1):
+            Polygon._line_on(bitmap, points[index], points[index + 1], color_id)
+
     def _line(
         self,
         x0: int,
@@ -104,16 +107,27 @@ class Polygon(displayio.TileGrid):
         y1: int,
         color: int,
     ) -> None:
+        self._line_on(self._bitmap, (x0, y0), (x1, y1), color)
+
+    @staticmethod
+    def _line_on(
+        bitmap: displayio.Bitmap,
+        p0: Tuple[int, int],
+        p1: Tuple[int, int],
+        color: int,
+    ) -> None:
+        (x0, y0) = p0
+        (x1, y1) = p1
         if x0 == x1:
             if y0 > y1:
                 y0, y1 = y1, y0
             for _h in range(y0, y1 + 1):
-                self._bitmap[x0, _h] = color
+                bitmap[x0, _h] = color
         elif y0 == y1:
             if x0 > x1:
                 x0, x1 = x1, x0
             for _w in range(x0, x1 + 1):
-                self._bitmap[_w, y0] = color
+                bitmap[_w, y0] = color
         else:
             steep = abs(y1 - y0) > abs(x1 - x0)
             if steep:
@@ -136,15 +150,13 @@ class Polygon(displayio.TileGrid):
 
             for x in range(x0, x1 + 1):
                 if steep:
-                    self._bitmap[y0, x] = color
+                    bitmap[y0, x] = color
                 else:
-                    self._bitmap[x, y0] = color
+                    bitmap[x, y0] = color
                 err -= dy
                 if err < 0:
                     y0 += ystep
                     err += dx
-
-    # pylint: enable=invalid-name, too-many-locals, too-many-branches
 
     @property
     def outline(self) -> Optional[int]:
