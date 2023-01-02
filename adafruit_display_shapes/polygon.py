@@ -55,14 +55,14 @@ class Polygon(displayio.TileGrid):
         close: Optional[bool] = True,
         colors: Optional[int] = 2,
     ) -> None:
-        (xs, ys) = zip(*points)
+        (x_s, y_s) = zip(*points)
 
-        x_offset = min(xs)
-        y_offset = min(ys)
+        x_offset = min(x_s)
+        y_offset = min(y_s)
 
         # Find the largest and smallest X values to figure out width for bitmap
-        width = max(xs) - min(xs) + 1
-        height = max(ys) - min(ys) + 1
+        width = max(x_s) - min(x_s) + 1
+        height = max(y_s) - min(y_s) + 1
 
         self._palette = displayio.Palette(colors + 1)
         self._palette.make_transparent(0)
@@ -99,64 +99,70 @@ class Polygon(displayio.TileGrid):
         for index in range(len(points) - 1):
             Polygon._line_on(bitmap, points[index], points[index + 1], color_id)
 
+    # pylint: disable=too-many-arguments
     def _line(
         self,
-        x0: int,
-        y0: int,
-        x1: int,
-        y1: int,
+        x_0: int,
+        y_0: int,
+        x_1: int,
+        y_1: int,
         color: int,
     ) -> None:
-        self._line_on(self._bitmap, (x0, y0), (x1, y1), color)
+        self._line_on(self._bitmap, (x_0, y_0), (x_1, y_1), color)
 
+    # pylint: enable=too-many-arguments
+
+    # pylint: disable=too-many-branches, too-many-locals
     @staticmethod
     def _line_on(
         bitmap: displayio.Bitmap,
-        p0: Tuple[int, int],
-        p1: Tuple[int, int],
+        p_0: Tuple[int, int],
+        p_1: Tuple[int, int],
         color: int,
     ) -> None:
-        (x0, y0) = p0
-        (x1, y1) = p1
-        if x0 == x1:
-            if y0 > y1:
-                y0, y1 = y1, y0
-            for _h in range(y0, y1 + 1):
-                bitmap[x0, _h] = color
-        elif y0 == y1:
-            if x0 > x1:
-                x0, x1 = x1, x0
-            for _w in range(x0, x1 + 1):
-                bitmap[_w, y0] = color
+        (x_0, y_0) = p_0
+        (x_1, y_1) = p_1
+        if x_0 == x_1:
+            if y_0 > y_1:
+                y_0, y_1 = y_1, y_0
+            for _h in range(y_0, y_1 + 1):
+                bitmap[x_0, _h] = color
+        elif y_0 == y_1:
+            if x_0 > x_1:
+                x_0, x_1 = x_1, x_0
+            for _w in range(x_0, x_1 + 1):
+                bitmap[_w, y_0] = color
         else:
-            steep = abs(y1 - y0) > abs(x1 - x0)
+            steep = abs(y_1 - y_0) > abs(x_1 - x_0)
             if steep:
-                x0, y0 = y0, x0
-                x1, y1 = y1, x1
+                x_0, y_0 = y_0, x_0
+                x_1, y_1 = y_1, x_1
 
-            if x0 > x1:
-                x0, x1 = x1, x0
-                y0, y1 = y1, y0
+            if x_0 > x_1:
+                x_0, x_1 = x_1, x_0
+                y_0, y_1 = y_1, y_0
 
-            dx = x1 - x0
-            dy = abs(y1 - y0)
+            d_x = x_1 - x_0
+            d_y = abs(y_1 - y_0)
 
-            err = dx / 2
+            err = d_x / 2
 
-            if y0 < y1:
+            if y_0 < y_1:
                 ystep = 1
             else:
                 ystep = -1
 
-            for x in range(x0, x1 + 1):
+            for x in range(x_0, x_1 + 1):
                 if steep:
-                    bitmap[y0, x] = color
+                    bitmap[y_0, x] = color
                 else:
-                    bitmap[x, y0] = color
-                err -= dy
+                    bitmap[x, y_0] = color
+                err -= d_y
                 if err < 0:
-                    y0 += ystep
-                    err += dx
+                    y_0 += ystep
+                    err += d_x
+
+    # pylint: enable=too-many-branches, too-many-locals
 
     @property
     def outline(self) -> Optional[int]:
