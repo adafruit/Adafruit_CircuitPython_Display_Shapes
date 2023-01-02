@@ -101,7 +101,7 @@ class Triangle(Polygon):
                     point_a[1] - y0,
                     point_b[0] - min(xs),
                     point_b[1] - y0,
-                    1,
+                    self._OUTLINE,
                 )
 
     # pylint: disable=invalid-name, too-many-branches
@@ -126,7 +126,7 @@ class Triangle(Polygon):
                 a = x2
             elif x2 > b:
                 b = x2
-            self._line(a, y0, b, y0, 2)
+            self._line(a, y0, b, y0, self._FILL)
             return
 
         if y1 == y2:
@@ -140,7 +140,7 @@ class Triangle(Polygon):
             b = round(x0 + (x2 - x0) * (y - y0) / (y2 - y0))
             if a > b:
                 a, b = b, a
-            self._line(a, y, b, y, 2)
+            self._line(a, y, b, y, self._FILL)
         # Lower Triangle
         for y in range(last + 1, y2 + 1):
             a = round(x1 + (x2 - x1) * (y - y1) / (y2 - y1))
@@ -148,7 +148,7 @@ class Triangle(Polygon):
 
             if a > b:
                 a, b = b, a
-            self._line(a, y, b, y, 2)
+            self._line(a, y, b, y, self._FILL)
 
     # pylint: enable=invalid-name, too-many-locals, too-many-branches
 
@@ -156,13 +156,13 @@ class Triangle(Polygon):
     def fill(self) -> Optional[int]:
         """The fill of the triangle. Can be a hex value for a color or
         ``None`` for transparent."""
-        return self._palette[2]
+        return self._palette[self._FILL]
 
     @fill.setter
     def fill(self, color: Optional[int]) -> None:
         if color is None:
-            self._palette[2] = 0
-            self._palette.make_transparent(2)
+            self._palette[self._FILL] = 0
+            self._palette.make_transparent(self._FILL)
         else:
-            self._palette[2] = color
-            self._palette.make_opaque(2)
+            self._palette[self._FILL] = color
+            self._palette.make_opaque(self._FILL)
