@@ -31,6 +31,7 @@ import displayio
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.git"
 
+_OUTLINE_COLOR_INDEX = 1
 
 class Polygon(displayio.TileGrid):
     # pylint: disable=too-many-arguments,invalid-name
@@ -66,9 +67,9 @@ class Polygon(displayio.TileGrid):
         width = max(xs) - min(xs) + 1
         height = max(ys) - min(ys) + 1
 
-        self._palette = displayio.Palette(3)
+        self._palette = displayio.Palette(2)
         self._palette.make_transparent(0)
-        self._bitmap = displayio.Bitmap(width, height, 3)
+        self._bitmap = displayio.Bitmap(width, height, 2)
 
         if outline is not None:
             # print("outline")
@@ -81,7 +82,6 @@ class Polygon(displayio.TileGrid):
                     point_a[1] - y_offset,
                     point_b[0] - x_offset,
                     point_b[1] - y_offset,
-                    1,
                 )
 
         super().__init__(
@@ -95,18 +95,17 @@ class Polygon(displayio.TileGrid):
         y0: int,
         x1: int,
         y1: int,
-        color: int,
     ) -> None:
         if x0 == x1:
             if y0 > y1:
                 y0, y1 = y1, y0
             for _h in range(y0, y1 + 1):
-                self._bitmap[x0, _h] = color
+                self._bitmap[x0, _h] = _OUTLINE_COLOR_INDEX
         elif y0 == y1:
             if x0 > x1:
                 x0, x1 = x1, x0
             for _w in range(x0, x1 + 1):
-                self._bitmap[_w, y0] = color
+                self._bitmap[_w, y0] = _OUTLINE_COLOR_INDEX
         else:
             steep = abs(y1 - y0) > abs(x1 - x0)
             if steep:
@@ -129,9 +128,9 @@ class Polygon(displayio.TileGrid):
 
             for x in range(x0, x1 + 1):
                 if steep:
-                    self._bitmap[y0, x] = color
+                    self._bitmap[y0, x] = _OUTLINE_COLOR_INDEX
                 else:
-                    self._bitmap[x, y0] = color
+                    self._bitmap[x, y0] = _OUTLINE_COLOR_INDEX
                 err -= dy
                 if err < 0:
                     y0 += ystep
@@ -143,13 +142,13 @@ class Polygon(displayio.TileGrid):
     def outline(self) -> Optional[int]:
         """The outline of the polygon. Can be a hex value for a color or
         ``None`` for no outline."""
-        return self._palette[1]
+        return self._palette[_OUTLINE_COLOR_INDEX]
 
     @outline.setter
     def outline(self, color: Optional[int]) -> None:
         if color is None:
-            self._palette[1] = 0
-            self._palette.make_transparent(1)
+            self._palette[_OUTLINE_COLOR_INDEX] = 0
+            self._palette.make_transparent(_OUTLINE_COLOR_INDEX)
         else:
-            self._palette[1] = color
-            self._palette.make_opaque(1)
+            self._palette[_OUTLINE_COLOR_INDEX] = color
+            self._palette.make_opaque(_OUTLINE_COLOR_INDEX)
