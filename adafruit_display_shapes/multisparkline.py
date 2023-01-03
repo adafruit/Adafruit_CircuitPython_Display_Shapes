@@ -106,6 +106,7 @@ class MultiSparkline(displayio.TileGrid):
     will scroll to the left.
     """
 
+    # pylint: disable=too-many-arguments, too-many-instance-attributes
     def __init__(
         self,
         width: int,
@@ -149,6 +150,8 @@ class MultiSparkline(displayio.TileGrid):
         self._bitmap = displayio.Bitmap(width, height, self._lines + 1)
 
         super().__init__(self._bitmap, pixel_shader=self._palette, x=x, y=y)
+
+    # pylint: enable=too-many-arguments
 
     def clear_values(self) -> None:
         """Clears _buffer and removes all lines in the group"""
@@ -208,11 +211,10 @@ class MultiSparkline(displayio.TileGrid):
 
         if slope == 0 and y_1 != horizontal_y:  # does not intercept horizontalY
             return None
-        else:
-            xint = (
-                horizontal_y - b
-            ) / slope  # calculate the x-intercept at position y=horizontalY
-            return int(xint)
+        xint = (
+            horizontal_y - b
+        ) / slope  # calculate the x-intercept at position y=horizontalY
+        return int(xint)
 
     def _add_point(
         self,
@@ -234,6 +236,7 @@ class MultiSparkline(displayio.TileGrid):
         for i in range(self._lines):
             Polygon.draw(self._bitmap, self._points[i].values(), i + 1, close=False)
 
+    # pylint: disable=too-many-locals, too-many-nested-blocks, too-many-branches
     def update_line(self, line: int = None) -> None:
         """Update the drawing of the sparkline.
         param int|None line: Line to update. Set to None for updating all (default).
@@ -245,9 +248,9 @@ class MultiSparkline(displayio.TileGrid):
             lines = [line]
 
         redraw = False
-        for l in lines:
+        for a_line in lines:
             # bail out early if we only have a single point
-            n_points = self._buffers[l].len()
+            n_points = self._buffers[a_line].len()
             if n_points < 2:
                 continue
 
@@ -258,21 +261,21 @@ class MultiSparkline(displayio.TileGrid):
             else:
                 xpitch = self._xpitch
 
-            self._points[l].clear()  # remove all points
+            self._points[a_line].clear()  # remove all points
 
-            for count, value in enumerate(self._buffers[l].values()):
+            for count, value in enumerate(self._buffers[a_line].values()):
                 if count == 0:
-                    self._add_point(l, 0, value)
+                    self._add_point(a_line, 0, value)
                 else:
                     x = int(xpitch * count)
                     last_x = int(xpitch * (count - 1))
-                    top = self.y_tops[l]
-                    bottom = self.y_bottoms[l]
+                    top = self.y_tops[a_line]
+                    bottom = self.y_bottoms[a_line]
 
                     if (bottom <= last_value <= top) and (
                         bottom <= value <= top
                     ):  # both points are in range, plot the line
-                        self._add_point(l, x, value)
+                        self._add_point(a_line, x, value)
 
                     else:  # at least one point is out of range, clip one or both ends the line
                         if ((last_value > top) and (value > top)) or (
@@ -312,7 +315,9 @@ class MultiSparkline(displayio.TileGrid):
         if redraw:
             self._draw()
 
-    def values(self, line: int) -> List[float]:
+    # pylint: enable=too-many-locals, too-many-nested-blocks, too-many-branches
+
+    def values_of(self, line: int) -> List[float]:
         """Returns the values displayed on the sparkline at given index."""
 
         return self._buffers[line].values()

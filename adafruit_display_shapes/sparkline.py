@@ -63,6 +63,7 @@ class Sparkline(MultiSparkline):
     will scroll to the left.
     """
 
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         width: int,
@@ -78,6 +79,8 @@ class Sparkline(MultiSparkline):
         super().__init__(
             width, height, max_items, [color], dyn_xpitch, [y_min], [y_max], x, y
         )
+
+    # pylint: enable=too-many-arguments
 
     def add_value(self, value: float, update: bool = True) -> None:
         """Add a value to the sparkline.
@@ -100,4 +103,4 @@ class Sparkline(MultiSparkline):
     def values(self) -> List[float]:
         """Returns the values displayed on the sparkline."""
 
-        return self._buffers[0].values()
+        return self.values_of(0)
