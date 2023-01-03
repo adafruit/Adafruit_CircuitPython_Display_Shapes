@@ -308,7 +308,7 @@ class MultiSparkline(displayio.TileGrid):
                                         adj_x = xint_bottom
                                         adj_value = bottom  # y
 
-                                self._add_point(l, adj_x, adj_value)
+                                self._add_point(a_line, adj_x, adj_value)
 
                 last_value = value  # store value for the next iteration
 
