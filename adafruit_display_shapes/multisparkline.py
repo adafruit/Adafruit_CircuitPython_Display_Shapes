@@ -22,7 +22,9 @@ Implementation Notes
 """
 
 try:
-    from typing import Optional, List
+    from typing import Optional, List, TypeVar
+
+    T = TypeVar("T")
 except ImportError:
     pass
 import displayio
@@ -30,15 +32,15 @@ from adafruit_display_shapes.polygon import Polygon
 
 
 class _CyclicBuffer:
-    def __init__(self, size: int) -> None:
-        self._buffer = [0.0] * size
+    def __init__(self, size: int, init_value: T) -> None:
+        self._buffer = [init_value] * size
         self._start = 0  # between 0 and size-1
         self._end = 0  # between 0 and 2*size-1
 
-    def push(self, value: int | float) -> None:
+    def push(self, value: T) -> None:
         """Pushes value at the end of the buffer.
 
-        :param int|float value: value to be pushed
+        :param T value: value to be pushed
 
         """
 
@@ -47,7 +49,7 @@ class _CyclicBuffer:
         self._buffer[self._end % len(self._buffer)] = value
         self._end += 1
 
-    def pop(self) -> int | float:
+    def pop(self) -> T:
         """Pop value from the start of the buffer and returns it."""
 
         if self.len() == 0:
@@ -70,7 +72,7 @@ class _CyclicBuffer:
         self._start = 0
         self._end = 0
 
-    def values(self) -> List[int | float]:
+    def values(self) -> List[T]:
         """Returns valid data from the buffer."""
 
         if self.len() == 0:
@@ -123,10 +125,10 @@ class MultiSparkline(displayio.TileGrid):
         self._max_items = max_items  # maximum number of items in the list
         self._lines = len(colors)
         self._buffers = [
-            _CyclicBuffer(self._max_items) for i in range(self._lines)
+            _CyclicBuffer(self._max_items, 0.0) for i in range(self._lines)
         ]  # values per sparkline
         self._points = [
-            _CyclicBuffer(self._max_items) for i in range(self._lines)
+            _CyclicBuffer(self._max_items, (0, 0)) for i in range(self._lines)
         ]  # _points: all points of sparkline
         self.dyn_xpitch = dyn_xpitch
         if not dyn_xpitch:
@@ -196,26 +198,6 @@ class MultiSparkline(displayio.TileGrid):
                 if update:
                     self.update_line(i)
 
-    @staticmethod
-    def _xintercept(
-        x_1: float,
-        y_1: float,
-        x_2: float,
-        y_2: float,
-        horizontal_y: float,
-    ) -> Optional[
-        int
-    ]:  # finds intercept of the line and a horizontal line at horizontalY
-        slope = (y_2 - y_1) / (x_2 - x_1)
-        b = y_1 - slope * x_1
-
-        if slope == 0 and y_1 != horizontal_y:  # does not intercept horizontalY
-            return None
-        xint = (
-            horizontal_y - b
-        ) / slope  # calculate the x-intercept at position y=horizontalY
-        return int(xint)
-
     def _add_point(
         self,
         line: int,
@@ -236,7 +218,6 @@ class MultiSparkline(displayio.TileGrid):
         for i in range(self._lines):
             Polygon.draw(self._bitmap, self._points[i].values(), i + 1, close=False)
 
-    # pylint: disable=too-many-locals, too-many-nested-blocks, too-many-branches
     def update_line(self, line: int = None) -> None:
         """Update the drawing of the sparkline.
         param int|None line: Line to update. Set to None for updating all (default).
@@ -264,58 +245,10 @@ class MultiSparkline(displayio.TileGrid):
             self._points[a_line].clear()  # remove all points
 
             for count, value in enumerate(self._buffers[a_line].values()):
-                if count == 0:
-                    self._add_point(a_line, 0, value)
-                else:
-                    x = int(xpitch * count)
-                    last_x = int(xpitch * (count - 1))
-                    top = self.y_tops[a_line]
-                    bottom = self.y_bottoms[a_line]
-
-                    if (bottom <= last_value <= top) and (
-                        bottom <= value <= top
-                    ):  # both points are in range, plot the line
-                        self._add_point(a_line, x, value)
-
-                    else:  # at least one point is out of range, clip one or both ends the line
-                        if ((last_value > top) and (value > top)) or (
-                            (last_value < bottom) and (value < bottom)
-                        ):
-                            # both points are on the same side out of range: don't draw anything
-                            pass
-                        else:
-                            xint_bottom = self._xintercept(
-                                last_x, last_value, x, value, bottom
-                            )  # get possible new x intercept points
-                            xint_top = self._xintercept(
-                                last_x, last_value, x, value, top
-                            )  # on the top and bottom of range
-                            if (xint_bottom is None) or (
-                                xint_top is None
-                            ):  # out of range doublecheck
-                                pass
-                            else:
-                                # Initialize the adjusted values as the baseline
-                                adj_x = x
-                                adj_value = value
-
-                                if value > last_value:  # slope is positive
-                                    if xint_top <= x:  # top is clipped
-                                        adj_x = xint_top
-                                        adj_value = top  # y
-                                else:  # slope is negative
-                                    if xint_bottom <= x:  # bottom is clipped
-                                        adj_x = xint_bottom
-                                        adj_value = bottom  # y
-
-                                self._add_point(a_line, adj_x, adj_value)
-
-                last_value = value  # store value for the next iteration
+                self._add_point(a_line, int(xpitch * count), value)
 
         if redraw:
             self._draw()
-
-    # pylint: enable=too-many-locals, too-many-nested-blocks, too-many-branches
 
     def values_of(self, line: int) -> List[float]:
         """Returns the values displayed on the sparkline at given index."""

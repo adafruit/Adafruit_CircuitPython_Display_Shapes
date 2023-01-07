@@ -112,6 +112,16 @@ class Polygon(displayio.TileGrid):
 
     # pylint: enable=too-many-arguments
 
+    @staticmethod
+    def _safe_draw(
+        bitmap: displayio.Bitmap,
+        p: Tuple[int, int],
+        color: int,
+    ) -> None:
+        (x, y) = p
+        if 0 <= x < bitmap.width and 0 <= y < bitmap.height:
+            bitmap[x, y] = color
+
     # pylint: disable=too-many-branches, too-many-locals
     @staticmethod
     def _line_on(
@@ -122,16 +132,20 @@ class Polygon(displayio.TileGrid):
     ) -> None:
         (x_0, y_0) = p_0
         (x_1, y_1) = p_1
+
+        def pt_on(x, y):
+            Polygon._safe_draw(bitmap, (x, y), color)
+
         if x_0 == x_1:
             if y_0 > y_1:
                 y_0, y_1 = y_1, y_0
             for _h in range(y_0, y_1 + 1):
-                bitmap[x_0, _h] = color
+                pt_on(x_0, _h)
         elif y_0 == y_1:
             if x_0 > x_1:
                 x_0, x_1 = x_1, x_0
             for _w in range(x_0, x_1 + 1):
-                bitmap[_w, y_0] = color
+                pt_on(_w, y_0)
         else:
             steep = abs(y_1 - y_0) > abs(x_1 - x_0)
             if steep:
@@ -154,9 +168,9 @@ class Polygon(displayio.TileGrid):
 
             for x in range(x_0, x_1 + 1):
                 if steep:
-                    bitmap[y_0, x] = color
+                    pt_on(y_0, x)
                 else:
-                    bitmap[x, y_0] = color
+                    pt_on(x, y_0)
                 err -= d_y
                 if err < 0:
                     y_0 += ystep
