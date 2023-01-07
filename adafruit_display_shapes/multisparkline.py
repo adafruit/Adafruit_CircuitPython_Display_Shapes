@@ -141,7 +141,7 @@ class MultiSparkline(displayio.TileGrid):
         # y_bottom: The actual minimum value of the vertical scale, will be
         # updated if autorange
         self.y_tops = self.y_maxs.copy()
-        # y_top: The actual minimum value of the vertical scale, will be
+        # y_top: The actual maximum value of the vertical scale, will be
         # updated if autorange
         self._palette = displayio.Palette(self._lines + 1)
         self._palette.make_transparent(0)
@@ -194,7 +194,7 @@ class MultiSparkline(displayio.TileGrid):
                 self.y_bottoms[i] = bottom
 
                 if update:
-                    self.update(i)
+                    self.update_line(i)
 
     @staticmethod
     def _xintercept(

@@ -104,3 +104,17 @@ class Sparkline(MultiSparkline):
         """Returns the values displayed on the sparkline."""
 
         return self.values_of(0)
+
+    @property
+    def y_top(self) -> float:
+        """
+        :return: The actual maximum value of the vertical scale, will be updated if autorange
+        """
+        return self.y_tops[0]
+
+    @property
+    def y_bottom(self) -> float:
+        """
+        :return: The actual minimum value of the vertical scale, will be updated if autorange
+        """
+        return self.y_bottoms[0]
