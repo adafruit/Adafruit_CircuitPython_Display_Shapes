@@ -115,10 +115,10 @@ class Polygon(displayio.TileGrid):
     @staticmethod
     def _safe_draw(
         bitmap: displayio.Bitmap,
-        p: Tuple[int, int],
+        point: Tuple[int, int],
         color: int,
     ) -> None:
-        (x, y) = p
+        (x, y) = point
         if 0 <= x < bitmap.width and 0 <= y < bitmap.height:
             bitmap[x, y] = color
 
