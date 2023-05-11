@@ -47,6 +47,7 @@ class Triangle(Polygon):
     :param int|None outline: The outline of the triangle. Can be a hex value for a color or
                     ``None`` for no outline.
     """
+
     # pylint: disable=too-many-locals
     def __init__(
         self,

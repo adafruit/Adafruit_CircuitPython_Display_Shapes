@@ -43,7 +43,6 @@ delta_y = 2
 display.show(main_group)
 
 while True:
-
     if circle.y + circle_radius >= display.height - circle_radius:
         delta_y = -1
     if circle.x + circle_radius >= display.width - circle_radius:

@@ -225,7 +225,6 @@ i = 0  # This is a counter for changing the random values for mySparkline3
 
 # Start the main loop
 while True:
-
     # Turn off auto_refresh to prevent partial updates of the screen during updates
     # of the sparklines
     display.auto_refresh = False

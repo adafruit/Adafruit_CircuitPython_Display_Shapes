@@ -175,7 +175,6 @@ display.show(my_group)
 
 # Start the main loop
 while True:
-
     # Turn off auto_refresh to prevent partial updates of the screen during updates
     # of the sparkline drawing
     display.auto_refresh = False

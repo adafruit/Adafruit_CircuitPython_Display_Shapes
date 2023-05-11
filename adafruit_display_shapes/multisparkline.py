@@ -147,7 +147,7 @@ class MultiSparkline(displayio.TileGrid):
         # updated if autorange
         self._palette = displayio.Palette(self._lines + 1)
         self._palette.make_transparent(0)
-        for (i, color) in enumerate(colors):
+        for i, color in enumerate(colors):
             self._palette[i + 1] = color
         self._bitmap = displayio.Bitmap(width, height, self._lines + 1)
 
@@ -172,7 +172,7 @@ class MultiSparkline(displayio.TileGrid):
         call the update()-method
         """
 
-        for (i, value) in enumerate(values):
+        for i, value in enumerate(values):
             if value is not None:
                 top = self.y_tops[i]
                 bottom = self.y_bottoms[i]

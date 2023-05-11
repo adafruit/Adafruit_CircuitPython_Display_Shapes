@@ -121,7 +121,6 @@ display.show(my_group)
 
 # Start the main loop
 while True:
-
     # turn off the auto_refresh of the display while modifying the sparkline
     display.auto_refresh = False
 
