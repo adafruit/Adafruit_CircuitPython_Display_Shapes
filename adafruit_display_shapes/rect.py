@@ -62,6 +62,9 @@ class Rect(displayio.TileGrid):
         self._bitmap = displayio.Bitmap(width, height, 2)
         self._palette = displayio.Palette(2)
 
+        if width <= 0 or height <= 0:
+            raise ValueError("Width and height must be greater than 0")
+
         if outline is not None:
             self._palette[1] = outline
             for w in range(width):

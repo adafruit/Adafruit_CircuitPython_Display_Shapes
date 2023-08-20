@@ -68,6 +68,9 @@ class RoundRect(displayio.TileGrid):
             y_offset=height - 2 * r - 1,
         )
 
+        if width <= 0 or height <= 0:
+            raise ValueError("Width and height must be greater than 0")
+
         if fill is not None:
             self._palette[2] = fill
             self._palette.make_opaque(2)
