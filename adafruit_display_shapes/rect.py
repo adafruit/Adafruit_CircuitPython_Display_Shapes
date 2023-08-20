@@ -60,7 +60,7 @@ class Rect(displayio.TileGrid):
         stroke: int = 1,
     ) -> None:
         if width <= 0 or height <= 0:
-            raise ValueError("Width and height must be greater than 0")
+            raise ValueError("Rectangle dimensions must be larger than 0.")
 
         self._bitmap = displayio.Bitmap(width, height, 2)
         self._palette = displayio.Palette(2)
