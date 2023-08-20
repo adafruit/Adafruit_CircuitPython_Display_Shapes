@@ -52,6 +52,11 @@ class RoundRect(displayio.TileGrid):
         outline: Optional[int] = None,
         stroke: int = 1,
     ) -> None:
+        if r > width / 2 or r > height / 2:
+            raise ValueError("Radius too large for given dimensions")
+        if width <= 0 or height <= 0:
+            raise ValueError("Width and height must be greater than 0")
+
         self._palette = displayio.Palette(3)
         self._palette.make_transparent(0)
         self._bitmap = displayio.Bitmap(width, height, 3)
@@ -67,9 +72,6 @@ class RoundRect(displayio.TileGrid):
             x_offset=width - 2 * r - 1,
             y_offset=height - 2 * r - 1,
         )
-
-        if width <= 0 or height <= 0:
-            raise ValueError("Width and height must be greater than 0")
 
         if fill is not None:
             self._palette[2] = fill
