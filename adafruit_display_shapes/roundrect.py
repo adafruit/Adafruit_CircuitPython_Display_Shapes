@@ -52,6 +52,13 @@ class RoundRect(displayio.TileGrid):
         outline: Optional[int] = None,
         stroke: int = 1,
     ) -> None:
+        if width <= 0 or height <= 0:
+            raise ValueError("Rectangle dimensions must be larger than 0.")
+        if r > width / 2 or r > height / 2:
+            raise ValueError(
+                "Radius cannot exceed half of the smaller side (width or height)."
+            )
+
         self._palette = displayio.Palette(3)
         self._palette.make_transparent(0)
         self._bitmap = displayio.Bitmap(width, height, 3)
