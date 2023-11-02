@@ -17,7 +17,7 @@ display = board.DISPLAY
 
 # Make the display context
 splash = displayio.Group()
-display.show(splash)
+display.root_group = splash
 
 # Make a background color fill
 color_bitmap = displayio.Bitmap(display.width, display.height, 1)

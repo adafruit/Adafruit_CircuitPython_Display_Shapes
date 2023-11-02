@@ -40,7 +40,7 @@ delta_x = 2
 delta_y = 2
 
 # Showing the items on the screen
-display.show(main_group)
+display.root_group = main_group
 
 while True:
     if circle.y + circle_radius >= display.height - circle_radius:

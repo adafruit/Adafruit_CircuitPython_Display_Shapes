@@ -11,7 +11,7 @@
 # using `add_value` are plotted.
 #
 # The `sparkline` class creates an element suitable for adding to the display
-# using `display.show(mySparkline)` or adding to a `displayio.Group` to be displayed.
+# using `display.root_group=mySparkline` or adding to a `displayio.Group` to be displayed.
 #
 # When creating the sparkline, identify the number of `max_items` that will be
 # included in the graph.
@@ -86,7 +86,7 @@ if "DISPLAY" not in dir(board):
     )
 
     # reset the display to show nothing.
-    display.show(None)
+    display.root_group = None
 else:
     # built-in display
     display = board.DISPLAY
@@ -171,7 +171,7 @@ for i in range(total_ticks + 1):
 
 
 # Set the display to show my_group that contains the sparkline and other graphics
-display.show(my_group)
+display.root_group = my_group
 
 # Start the main loop
 while True:

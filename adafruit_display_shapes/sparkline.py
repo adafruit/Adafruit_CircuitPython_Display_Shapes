@@ -11,7 +11,7 @@
 # add_value` are plotted.
 #
 # The `sparkline` class creates an element suitable for adding to the display using
-# `display.show(mySparkline)`
+# `display.root_group=mySparkline`
 # or adding to a `displayio.Group` to be displayed.
 #
 # When creating the sparkline, identify the number of `max_items` that will be
