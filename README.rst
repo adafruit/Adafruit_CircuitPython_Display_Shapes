@@ -66,7 +66,7 @@ Usage Example
     from adafruit_display_shapes.roundrect import RoundRect
 
     splash = displayio.Group()
-    board.DISPLAY.show(splash)
+    board.DISPLAY.root_group = splash
 
     color_bitmap = displayio.Bitmap(320, 240, 1)
     color_palette = displayio.Palette(1)
