@@ -63,6 +63,7 @@ Usage Example
     import displayio
     from adafruit_display_shapes.rect import Rect
     from adafruit_display_shapes.circle import Circle
+    from adafruit_display_shapes.arc import Arc
     from adafruit_display_shapes.roundrect import RoundRect
 
     splash = displayio.Group()
@@ -83,6 +84,9 @@ Usage Example
 
     circle = Circle(100, 100, 20, fill=0x00FF00, outline=0xFF00FF)
     splash.append(circle)
+
+    arc = Arc(x=100, y=100, radius=25, angle=45, direction=90, segments=10, outline=0x00FF00)
+    splash.append(arc)
 
     rect2 = Rect(50, 100, 61, 81, outline=0x0, stroke=3)
     splash.append(rect2)
