@@ -99,8 +99,6 @@ class Arc(displayio.Group):
                 points.append((x0, y0))
 
         # create polygon(s) and add to ourselves
-        if outline is not None:
-            self.append(Polygon(points, outline=outline, colors=1, close=arc_width > 1))
         if arc_width > 1 and HAVE_VECTORIO and fill is not None:
             palette = displayio.Palette(1)
             palette[0] = fill
