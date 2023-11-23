@@ -51,3 +51,12 @@ Example showing the features of the new Circle setter
 .. literalinclude:: ../examples/display_shapes_circle_animation.py
     :caption: examples/display_shapes_circle_animation.py
     :linenos:
+
+Arc Simple Test
+---------------
+
+Example demonstrating various arcs.
+
+.. literalinclude:: ../examples/display_shapes_arc.py
+    :caption: examples/display_shapes_arc.py
+    :linenos:
