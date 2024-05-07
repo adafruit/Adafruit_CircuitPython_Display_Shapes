@@ -172,10 +172,8 @@ class MultiSparkline(displayio.TileGrid):
         call the update()-method
         """
 
-        lines_to_update = []
         for i, value in enumerate(values):
             if value is not None:
-                lines_to_update.append(i)
                 top = self.y_tops[i]
                 bottom = self.y_bottoms[i]
                 if (
@@ -197,8 +195,8 @@ class MultiSparkline(displayio.TileGrid):
                 self.y_tops[i] = top
                 self.y_bottoms[i] = bottom
 
-        if update and lines_to_update:
-            self.update_line(lines_to_update)
+                if update:
+                    self.update_line(i)
 
     def _add_point(
         self,
