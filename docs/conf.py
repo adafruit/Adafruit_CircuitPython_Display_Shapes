@@ -116,6 +116,8 @@ html_static_path = ["_static"]
 #
 html_favicon = "_static/favicon.ico"
 
+html_css_files = ["custom.css"]
+
 # Output file base name for HTML help builder.
 htmlhelp_basename = "AdafruitDisplay_shapesLibrarydoc"
 
