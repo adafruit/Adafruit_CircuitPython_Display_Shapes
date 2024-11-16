@@ -26,6 +26,7 @@ try:
 except ImportError:
     pass
 
+import bitmaptools
 import displayio
 
 __version__ = "0.0.0+auto.0"
@@ -42,6 +43,7 @@ class Polygon(displayio.TileGrid):
     :param int colors: (Optional) Number of colors to use. Most polygons would use two, one for
                     outline and one for fill. If you're not filling your polygon, set this to 1
                     for smaller memory footprint. (2)
+    :param int stroke: Thickness of the outline.
     """
 
     _OUTLINE = 1
@@ -54,6 +56,8 @@ class Polygon(displayio.TileGrid):
         outline: Optional[int] = None,
         close: Optional[bool] = True,
         colors: Optional[int] = 2,
+        stroke: int = 1,
+        # pylint: disable=too-many-arguments
     ) -> None:
         (x_s, y_s) = zip(*points)
 
@@ -66,13 +70,14 @@ class Polygon(displayio.TileGrid):
 
         self._palette = displayio.Palette(colors + 1)
         self._palette.make_transparent(0)
-        self._bitmap = displayio.Bitmap(width, height, colors + 1)
+        self._bitmap = displayio.Bitmap(width + stroke, height + stroke, colors + 1)
+        self._stroke = stroke
 
         shifted = [(x - x_offset, y - y_offset) for (x, y) in points]
 
         if outline is not None:
             self.outline = outline
-            self.draw(self._bitmap, shifted, self._OUTLINE, close)
+            self.draw(self._bitmap, shifted, self._OUTLINE, close, stroke)
 
         super().__init__(
             self._bitmap, pixel_shader=self._palette, x=x_offset, y=y_offset
@@ -84,6 +89,7 @@ class Polygon(displayio.TileGrid):
         points: List[Tuple[int, int]],
         color_id: int,
         close: Optional[bool] = True,
+        stroke=1,
     ) -> None:
         """Draw a polygon conecting points on provided bitmap with provided color_id
 
@@ -97,7 +103,7 @@ class Polygon(displayio.TileGrid):
             points.append(points[0])
 
         for index in range(len(points) - 1):
-            Polygon._line_on(bitmap, points[index], points[index + 1], color_id)
+            Polygon._line_on(bitmap, points[index], points[index + 1], color_id, stroke)
 
     # pylint: disable=too-many-arguments
     def _line(
@@ -129,23 +135,36 @@ class Polygon(displayio.TileGrid):
         p_0: Tuple[int, int],
         p_1: Tuple[int, int],
         color: int,
+        stroke: int = 1,
     ) -> None:
         (x_0, y_0) = p_0
         (x_1, y_1) = p_1
 
-        def pt_on(x, y):
-            Polygon._safe_draw(bitmap, (x, y), color)
+        def pt_on(x, y, pt_size=1):
+            if pt_size > 1:
+                x = x + pt_size // 2
+                y = y + pt_size // 2
+                bitmaptools.fill_region(
+                    bitmap,
+                    x - (pt_size // 2),
+                    y - (pt_size // 2),
+                    x + (pt_size // 2),
+                    y + (pt_size // 2),
+                    color,
+                )
+            else:
+                Polygon._safe_draw(bitmap, (x, y), color)
 
         if x_0 == x_1:
             if y_0 > y_1:
                 y_0, y_1 = y_1, y_0
             for _h in range(y_0, y_1 + 1):
-                pt_on(x_0, _h)
+                pt_on(x_0, _h, stroke)
         elif y_0 == y_1:
             if x_0 > x_1:
                 x_0, x_1 = x_1, x_0
             for _w in range(x_0, x_1 + 1):
-                pt_on(_w, y_0)
+                pt_on(_w, y_0, stroke)
         else:
             steep = abs(y_1 - y_0) > abs(x_1 - x_0)
             if steep:
@@ -168,9 +187,9 @@ class Polygon(displayio.TileGrid):
 
             for x in range(x_0, x_1 + 1):
                 if steep:
-                    pt_on(y_0, x)
+                    pt_on(y_0, x, stroke)
                 else:
-                    pt_on(x, y_0)
+                    pt_on(x, y_0, stroke)
                 err -= d_y
                 if err < 0:
                     y_0 += ystep

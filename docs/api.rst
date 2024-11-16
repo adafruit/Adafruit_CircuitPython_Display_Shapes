@@ -22,6 +22,9 @@
 .. automodule:: adafruit_display_shapes.polygon
   :members:
 
+.. automodule:: adafruit_display_shapes.filled_polygon
+  :members:
+
 .. automodule:: adafruit_display_shapes.sparkline
   :members:
 
