@@ -60,3 +60,12 @@ Example demonstrating various arcs.
 .. literalinclude:: ../examples/display_shapes_arc.py
     :caption: examples/display_shapes_arc.py
     :linenos:
+
+Filled Polygon Simple Test
+--------------------------
+
+Example demonstrating a filled polygon
+
+.. literalinclude:: ../examples/display_shapes_filled_polygon_simpletest.py
+    :caption: examples/display_shapes_filled_polygon_simpletest.py
+    :linenos:
