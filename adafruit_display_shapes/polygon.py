@@ -26,7 +26,13 @@ try:
 except ImportError:
     pass
 
-import bitmaptools
+try:
+    import bitmaptools
+
+    HAVE_BITMAPTOOLS = True
+except ImportError:
+    HAVE_BITMAPTOOLS = False
+
 import displayio
 
 __version__ = "0.0.0+auto.0"
@@ -144,14 +150,19 @@ class Polygon(displayio.TileGrid):
             if pt_size > 1:
                 x = x + pt_size // 2
                 y = y + pt_size // 2
-                bitmaptools.fill_region(
-                    bitmap,
-                    x - (pt_size // 2),
-                    y - (pt_size // 2),
-                    x + (pt_size // 2),
-                    y + (pt_size // 2),
-                    color,
-                )
+                if HAVE_BITMAPTOOLS:
+                    bitmaptools.fill_region(
+                        bitmap,
+                        x - (pt_size // 2),
+                        y - (pt_size // 2),
+                        x + (pt_size // 2),
+                        y + (pt_size // 2),
+                        color,
+                    )
+                else:
+                    for p_x in range(x - (pt_size // 2), x + (pt_size // 2)):
+                        for p_y in range(y - (pt_size // 2), y + (pt_size // 2)):
+                            Polygon._safe_draw(bitmap, (p_x, p_y), color)
             else:
                 Polygon._safe_draw(bitmap, (x, y), color)
 
