@@ -22,12 +22,13 @@ Implementation Notes
 """
 
 try:
-    from typing import Optional, List, TypeVar
+    from typing import List, Optional, TypeVar
 
     T = TypeVar("T")
 except ImportError:
     pass
 import displayio
+
 from adafruit_display_shapes.polygon import Polygon
 
 
@@ -108,7 +109,6 @@ class MultiSparkline(displayio.TileGrid):
     will scroll to the left.
     """
 
-    # pylint: disable=too-many-arguments, too-many-instance-attributes
     def __init__(
         self,
         width: int,
@@ -152,8 +152,6 @@ class MultiSparkline(displayio.TileGrid):
         self._bitmap = displayio.Bitmap(width, height, self._lines + 1)
 
         super().__init__(self._bitmap, pixel_shader=self._palette, x=x, y=y)
-
-    # pylint: enable=too-many-arguments
 
     def clear_values(self) -> None:
         """Clears _buffer and removes all lines in the group"""

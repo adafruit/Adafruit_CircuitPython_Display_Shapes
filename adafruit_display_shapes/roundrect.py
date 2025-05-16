@@ -23,7 +23,6 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.gi
 
 
 class RoundRect(displayio.TileGrid):
-    # pylint: disable=too-many-arguments
     """A round-corner rectangle.
 
     :param int x: The x-position of the top left corner.
@@ -55,9 +54,7 @@ class RoundRect(displayio.TileGrid):
         if width <= 0 or height <= 0:
             raise ValueError("Rectangle dimensions must be larger than 0.")
         if r > width / 2 or r > height / 2:
-            raise ValueError(
-                "Radius cannot exceed half of the smaller side (width or height)."
-            )
+            raise ValueError("Radius cannot exceed half of the smaller side (width or height).")
 
         self._palette = displayio.Palette(3)
         self._palette.make_transparent(0)
@@ -105,7 +102,6 @@ class RoundRect(displayio.TileGrid):
             )
         super().__init__(self._bitmap, pixel_shader=self._palette, x=x, y=y)
 
-    # pylint: disable=invalid-name, too-many-locals, too-many-branches
     def _helper(
         self,
         x0: int,
@@ -161,8 +157,6 @@ class RoundRect(displayio.TileGrid):
                 for line in range(stroke):
                     self._bitmap[x0 + x + x_offset, y0 - y + line] = color
                     self._bitmap[x0 + y + x_offset - line, y0 - x] = color
-
-    # pylint: enable=invalid-name, too-many-locals, too-many-branches
 
     @property
     def fill(self) -> Optional[int]:

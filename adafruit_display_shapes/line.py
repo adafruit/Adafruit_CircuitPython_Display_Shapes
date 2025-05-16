@@ -33,7 +33,6 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.gi
 
 
 class Line(Polygon):
-    # pylint: disable=too-many-arguments,invalid-name, too-few-public-methods
     """A line.
 
     :param int x0: The x-position of the first vertex.

@@ -31,14 +31,15 @@
 
 import random
 import time
+
 import board
 import displayio
 import terminalio
 from adafruit_display_text import label
-from adafruit_display_shapes.sparkline import Sparkline
+
 from adafruit_display_shapes.line import Line
 from adafruit_display_shapes.rect import Rect
-
+from adafruit_display_shapes.sparkline import Sparkline
 
 if "DISPLAY" not in dir(board):
     # Setup the LCD display with driver
@@ -69,7 +70,7 @@ if "DISPLAY" not in dir(board):
         phase=1,
     )
 
-    print("spi.frequency: {}".format(spi.frequency))
+    print(f"spi.frequency: {spi.frequency}")
 
     # Number of pixels in the display
     DISPLAY_WIDTH = 320
@@ -121,18 +122,14 @@ sparkline1 = Sparkline(
 # Label the y-axis range
 
 text_xoffset = -10
-text_label1a = label.Label(
-    font=font, text=str(sparkline1.y_top), color=line_color
-)  # yTop label
+text_label1a = label.Label(font=font, text=str(sparkline1.y_top), color=line_color)  # yTop label
 text_label1a.anchor_point = (1, 0.5)  # set the anchorpoint at right-center
 text_label1a.anchored_position = (
     sparkline1.x + text_xoffset,
     sparkline1.y,
 )  # set the text anchored position to the upper right of the graph
 
-text_label1b = label.Label(
-    font=font, text=str(sparkline1.y_bottom), color=line_color
-)  # yTop label
+text_label1b = label.Label(font=font, text=str(sparkline1.y_bottom), color=line_color)  # yTop label
 text_label1b.anchor_point = (1, 0.5)  # set the anchorpoint at right-center
 text_label1b.anchored_position = (
     sparkline1.x + text_xoffset,
@@ -140,9 +137,7 @@ text_label1b.anchored_position = (
 )  # set the text anchored position to the upper right of the graph
 
 
-bounding_rectangle = Rect(
-    sparkline1.x, sparkline1.y, chart_width, chart_height, outline=line_color
-)
+bounding_rectangle = Rect(sparkline1.x, sparkline1.y, chart_width, chart_height, outline=line_color)
 
 
 # Create a group to hold the sparkline, text, rectangle and tickmarks

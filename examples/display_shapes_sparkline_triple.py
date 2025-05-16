@@ -31,12 +31,13 @@
 
 import random
 import time
+
 import board
 import displayio
 import terminalio
 from adafruit_display_text import label
-from adafruit_display_shapes.sparkline import Sparkline
 
+from adafruit_display_shapes.sparkline import Sparkline
 
 if "DISPLAY" not in dir(board):
     # Setup the LCD display with driver
@@ -67,7 +68,7 @@ if "DISPLAY" not in dir(board):
         phase=1,
     )
 
-    print("spi.frequency: {}".format(spi.frequency))
+    print(f"spi.frequency: {spi.frequency}")
 
     # Number of pixels in the display
     DISPLAY_WIDTH = 320
@@ -114,9 +115,7 @@ sparkline1 = Sparkline(
 )
 
 # Label the y-axis range
-text_label1a = label.Label(
-    font=font, text=str(sparkline1.y_top), color=0xFFFFFF
-)  # y_top label
+text_label1a = label.Label(font=font, text=str(sparkline1.y_top), color=0xFFFFFF)  # y_top label
 text_label1a.anchor_point = (0, 0.5)  # set the anchorpoint
 text_label1a.anchored_position = (
     10 + chart_width,

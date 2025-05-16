@@ -3,6 +3,7 @@
 
 import board
 import displayio
+
 from adafruit_display_shapes.filled_polygon import FilledPolygon
 
 # Make the display context

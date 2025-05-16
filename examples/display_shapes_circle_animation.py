@@ -5,10 +5,12 @@
 This is an animation to demonstrate the use of Circle Setter Attribute.
 """
 
-import time
 import gc
+import time
+
 import board
 import displayio
+
 from adafruit_display_shapes.circle import Circle
 
 # use built in display (MagTag, PyPortal, PyGamer, PyBadge, CLUE, etc.)

@@ -27,7 +27,9 @@ except ImportError:
     pass
 
 import math
+
 import displayio
+
 from adafruit_display_shapes.polygon import Polygon
 
 try:
@@ -42,7 +44,6 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.gi
 
 
 class Arc(displayio.Group):
-    # pylint: disable=too-few-public-methods, invalid-name
     """An arc. Technically, an arc is a Group with one or two polygons.
 
     An arc is defined by a radius, an angle (in degrees) and a direction (also in
@@ -67,7 +68,6 @@ class Arc(displayio.Group):
     """
 
     def __init__(
-        # pylint: disable=too-many-arguments, too-many-locals
         self,
         radius: float,
         angle: float,
@@ -107,9 +107,7 @@ class Arc(displayio.Group):
         # create inner points
         if self._arc_width > 1:
             for i in range(self._segments, -1, -1):
-                alpha = (
-                    (i * self._angle / self._segments + self._direction) / 180 * math.pi
-                )
+                alpha = (i * self._angle / self._segments + self._direction) / 180 * math.pi
                 x0 = int((self._radius - self._arc_width) * math.cos(alpha))
                 y0 = -int((self._radius - self._arc_width) * math.sin(alpha))
                 points.append((x0, y0))

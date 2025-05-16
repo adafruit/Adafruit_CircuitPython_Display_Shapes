@@ -3,12 +3,13 @@
 
 import board
 import displayio
-from adafruit_display_shapes.rect import Rect
+
 from adafruit_display_shapes.circle import Circle
-from adafruit_display_shapes.roundrect import RoundRect
-from adafruit_display_shapes.triangle import Triangle
 from adafruit_display_shapes.line import Line
 from adafruit_display_shapes.polygon import Polygon
+from adafruit_display_shapes.rect import Rect
+from adafruit_display_shapes.roundrect import RoundRect
+from adafruit_display_shapes.triangle import Triangle
 
 # Make the display context
 splash = displayio.Group()

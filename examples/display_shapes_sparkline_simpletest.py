@@ -30,11 +30,11 @@
 # 	add new values to sparkline `add_value`
 # 	update the sparklines `update`
 
-import time
 import random
+import time
+
 import board
 import displayio
-
 
 from adafruit_display_shapes.sparkline import Sparkline
 
@@ -68,7 +68,7 @@ if "DISPLAY" not in dir(board):
         phase=1,
     )
 
-    print("spi.frequency: {}".format(spi.frequency))
+    print(f"spi.frequency: {spi.frequency}")
 
     # Number of pixels in the display
     DISPLAY_WIDTH = 320

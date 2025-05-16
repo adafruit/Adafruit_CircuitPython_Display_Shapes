@@ -33,7 +33,6 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.gi
 
 
 class Circle(RoundRect):
-    # pylint: disable=too-few-public-methods, invalid-name
     """A circle.
 
     :param int x0: The x-position of the center.
