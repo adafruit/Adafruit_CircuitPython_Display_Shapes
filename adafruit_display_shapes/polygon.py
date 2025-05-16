@@ -22,7 +22,7 @@ Implementation Notes
 """
 
 try:
-    from typing import Optional, List, Tuple
+    from typing import List, Optional, Tuple
 except ImportError:
     pass
 
@@ -57,7 +57,6 @@ class Polygon(displayio.TileGrid):
         close: Optional[bool] = True,
         colors: Optional[int] = 2,
         stroke: int = 1,
-        # pylint: disable=too-many-arguments
     ) -> None:
         (x_s, y_s) = zip(*points)
 
@@ -79,9 +78,7 @@ class Polygon(displayio.TileGrid):
             self.outline = outline
             self.draw(self._bitmap, shifted, self._OUTLINE, close, stroke)
 
-        super().__init__(
-            self._bitmap, pixel_shader=self._palette, x=x_offset, y=y_offset
-        )
+        super().__init__(self._bitmap, pixel_shader=self._palette, x=x_offset, y=y_offset)
 
     @staticmethod
     def draw(
@@ -105,7 +102,6 @@ class Polygon(displayio.TileGrid):
         for index in range(len(points) - 1):
             Polygon._line_on(bitmap, points[index], points[index + 1], color_id, stroke)
 
-    # pylint: disable=too-many-arguments
     def _line(
         self,
         x_0: int,
@@ -115,8 +111,6 @@ class Polygon(displayio.TileGrid):
         color: int,
     ) -> None:
         self._line_on(self._bitmap, (x_0, y_0), (x_1, y_1), color)
-
-    # pylint: enable=too-many-arguments
 
     @staticmethod
     def _safe_draw(
@@ -128,7 +122,6 @@ class Polygon(displayio.TileGrid):
         if 0 <= x < bitmap.width and 0 <= y < bitmap.height:
             bitmap[x, y] = color
 
-    # pylint: disable=too-many-branches, too-many-locals
     @staticmethod
     def _line_on(
         bitmap: displayio.Bitmap,
@@ -194,8 +187,6 @@ class Polygon(displayio.TileGrid):
                 if err < 0:
                     y_0 += ystep
                     err += d_x
-
-    # pylint: enable=too-many-branches, too-many-locals
 
     @property
     def outline(self) -> Optional[int]:

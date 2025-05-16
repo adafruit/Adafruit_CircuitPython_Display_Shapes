@@ -23,11 +23,12 @@ Implementation Notes
 """
 
 try:
-    from typing import Optional, List, Tuple
+    from typing import List, Optional, Tuple
 except ImportError:
     pass
 
 import displayio
+
 from adafruit_display_shapes.polygon import Polygon
 
 try:
@@ -42,7 +43,6 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.gi
 
 
 class FilledPolygon(displayio.Group):
-    # pylint: disable=too-few-public-methods, invalid-name
     """A filled polygon. Technically, an FilledPolygon is a Group with one or two polygons.
 
     :param list points: A list of (x, y) tuples of the points

@@ -3,12 +3,13 @@
 
 import board
 import displayio
-from adafruit_display_shapes.rect import Rect
+
 from adafruit_display_shapes.circle import Circle
-from adafruit_display_shapes.roundrect import RoundRect
-from adafruit_display_shapes.triangle import Triangle
 from adafruit_display_shapes.line import Line
 from adafruit_display_shapes.polygon import Polygon
+from adafruit_display_shapes.rect import Rect
+from adafruit_display_shapes.roundrect import RoundRect
+from adafruit_display_shapes.triangle import Triangle
 
 # use built in display (PyPortal, PyGamer, PyBadge, CLUE, etc.)
 # see guide for setting up external displays (TFT / OLED breakouts, RGB matrices, etc.)

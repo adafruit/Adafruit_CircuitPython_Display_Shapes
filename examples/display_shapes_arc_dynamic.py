@@ -3,10 +3,12 @@
 """
 Illustrates how to dynamically update arcs over time.
 """
-import time
-import board
 
+import time
+
+import board
 import displayio
+
 from adafruit_display_shapes.arc import Arc
 from adafruit_display_shapes.circle import Circle
 

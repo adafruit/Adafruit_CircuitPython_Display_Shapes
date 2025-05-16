@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 import time
-import board
 
+import board
 import displayio
+
 from adafruit_display_shapes.arc import Arc
 from adafruit_display_shapes.circle import Circle
 

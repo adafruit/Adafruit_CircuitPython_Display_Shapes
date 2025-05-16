@@ -38,7 +38,7 @@ Implementation Notes
 """
 
 try:
-    from typing import Optional, List
+    from typing import List, Optional
 except ImportError:
     pass
 from adafruit_display_shapes.multisparkline import MultiSparkline
@@ -63,7 +63,6 @@ class Sparkline(MultiSparkline):
     will scroll to the left.
     """
 
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         width: int,
@@ -76,11 +75,7 @@ class Sparkline(MultiSparkline):
         y: int = 0,
         color: int = 0xFFFFFF,  # line color, default is WHITE
     ) -> None:
-        super().__init__(
-            width, height, max_items, [color], dyn_xpitch, [y_min], [y_max], x, y
-        )
-
-    # pylint: enable=too-many-arguments
+        super().__init__(width, height, max_items, [color], dyn_xpitch, [y_min], [y_max], x, y)
 
     def add_value(self, value: float, update: bool = True) -> None:
         """Add a value to the sparkline.
