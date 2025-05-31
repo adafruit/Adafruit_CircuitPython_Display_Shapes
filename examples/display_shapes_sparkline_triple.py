@@ -34,6 +34,7 @@ import time
 
 import board
 import displayio
+import fourwire
 import terminalio
 from adafruit_display_text import label
 
@@ -58,7 +59,7 @@ if "DISPLAY" not in dir(board):
         spi.configure(baudrate=32000000)
     spi.unlock()
 
-    display_bus = displayio.FourWire(
+    display_bus = fourwire.FourWire(
         spi,
         command=tft_dc,
         chip_select=tft_cs,
