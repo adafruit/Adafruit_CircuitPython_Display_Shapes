@@ -54,8 +54,8 @@ while True:
     if circle.y - circle_radius <= 0 - circle_radius:
         delta_y = 1
 
-    circle.x = circle.x + delta_x
-    circle.y = circle.y + delta_y
+    circle.x += delta_x
+    circle.y += delta_y
 
     time.sleep(0.02)
     gc.collect()

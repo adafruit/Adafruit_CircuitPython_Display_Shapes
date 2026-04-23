@@ -135,8 +135,8 @@ class Polygon(displayio.TileGrid):
 
         def pt_on(x, y, pt_size=1):
             if pt_size > 1:
-                x = x + pt_size // 2
-                y = y + pt_size // 2
+                x += pt_size // 2
+                y += pt_size // 2
                 bitmaptools.fill_region(
                     bitmap,
                     x - (pt_size // 2),
