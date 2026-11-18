@@ -28,12 +28,27 @@ except ImportError:
 
 import displayio
 
+from adafruit_display_shapes._vectorio import HAS_VECTORIO, get_color, set_color
+
+if HAS_VECTORIO:
+    from vectorio import Rectangle as _Rectangle
+else:
+    # No vectorio shape styles on this firmware, so the rectangle is drawn into a bitmap.
+    from displayio import TileGrid as _Rectangle
+
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.git"
 
+# Both implementations take the fill from palette entry 0 and the outline from entry 1.
+_FILL = 0
+_OUTLINE = 1
 
-class Rect(displayio.TileGrid):
+
+class Rect(_Rectangle):
     """A rectangle.
+
+    The rectangle is drawn with :py:mod:`vectorio` when the firmware has it, which needs no
+    bitmap and redraws only what changed. Older firmware builds a bitmap instead.
 
     :param int x: The x-position of the top left corner.
     :param int y: The y-position of the top left corner.
@@ -62,68 +77,72 @@ class Rect(displayio.TileGrid):
         if width <= 0 or height <= 0:
             raise ValueError("Rectangle dimensions must be larger than 0.")
 
-        self._bitmap = displayio.Bitmap(width, height, 2)
         self._palette = displayio.Palette(2)
+        self._palette.make_transparent(_FILL)
+        self._palette.make_transparent(_OUTLINE)
 
-        if outline is not None:
-            self._palette[1] = outline
-            for w in range(width):
-                for line in range(stroke):
-                    self._bitmap[w, line] = 1
-                    self._bitmap[w, height - 1 - line] = 1
-            for _h in range(height):
-                for line in range(stroke):
-                    self._bitmap[line, _h] = 1
-                    self._bitmap[width - 1 - line, _h] = 1
-
-        if fill is not None:
-            self._palette[0] = fill
-            self._palette.make_opaque(0)
+        if HAS_VECTORIO:
+            # vectorio draws the fill and the outline itself, and takes the outline width and
+            # both colors from the palette.
+            super().__init__(
+                pixel_shader=self._palette,
+                width=width,
+                height=height,
+                x=x,
+                y=y,
+                outline_width=stroke,
+                outline_color_index=_OUTLINE if outline is not None else None,
+            )
         else:
-            self._palette[0] = 0
-            self._palette.make_transparent(0)
-        super().__init__(self._bitmap, pixel_shader=self._palette, x=x, y=y)
+            self._bitmap = displayio.Bitmap(width, height, 2)
+            if outline is not None:
+                for w in range(width):
+                    for line in range(stroke):
+                        self._bitmap[w, line] = _OUTLINE
+                        self._bitmap[w, height - 1 - line] = _OUTLINE
+                for h in range(height):
+                    for line in range(stroke):
+                        self._bitmap[line, h] = _OUTLINE
+                        self._bitmap[width - 1 - line, h] = _OUTLINE
+            super().__init__(self._bitmap, pixel_shader=self._palette, x=x, y=y)
+
+        self.fill = fill
+        self.outline = outline
 
     @property
     def fill(self) -> Optional[int]:
         """The fill of the rectangle. Can be a hex value for a color or ``None`` for
         transparent."""
-        return self._palette[0]
+        return get_color(self._palette, _FILL)
 
     @fill.setter
     def fill(self, color: Optional[int]) -> None:
-        if color is None:
-            self._palette[0] = 0
-            self._palette.make_transparent(0)
-        else:
-            self._palette[0] = color
-            self._palette.make_opaque(0)
+        set_color(self._palette, _FILL, color)
 
     @property
     def outline(self) -> Optional[int]:
         """The outline of the rectangle. Can be a hex value for a color or ``None``
         for no outline."""
-        return self._palette[1]
+        return get_color(self._palette, _OUTLINE)
 
     @outline.setter
     def outline(self, color: Optional[int]) -> None:
-        if color is None:
-            self._palette[1] = 0
-            self._palette.make_transparent(1)
-        else:
-            self._palette[1] = color
-            self._palette.make_opaque(1)
+        set_color(self._palette, _OUTLINE, color)
 
-    @property
-    def width(self) -> int:
-        """
-        :return: the width of the rectangle in pixels
-        """
-        return self._bitmap.width
+    if not HAS_VECTORIO:
+        # A vectorio shape can be resized, so it answers width and height itself. A bitmap
+        # can't be, so these stay read only there.
 
-    @property
-    def height(self) -> int:
-        """
-        :return: the height of the rectangle in pixels
-        """
-        return self._bitmap.height
+        @property
+        def width(self) -> int:
+            """
+            :return: the width of the rectangle in pixels
+            """
+            return self._bitmap.width
+
+        @property
+        def height(self) -> int:
+            """
+            :return: the height of the rectangle in pixels
+            """
+            return self._bitmap.height
