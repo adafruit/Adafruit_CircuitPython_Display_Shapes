@@ -18,12 +18,29 @@ except ImportError:
 
 import displayio
 
+from adafruit_display_shapes._vectorio import HAS_VECTORIO, get_color, set_color
+
+if HAS_VECTORIO:
+    from vectorio import Rectangle as _Rectangle
+else:
+    # No vectorio shape styles on this firmware, so the shape is drawn into a bitmap.
+    from displayio import TileGrid as _Rectangle
+
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.git"
 
+# A bitmap needs one entry that means "nothing here", so its fill moves to entry 2. vectorio
+# shapes draw the fill and the outline with two entries and no background.
+_FILL = 0 if HAS_VECTORIO else 2
+_OUTLINE = 1
 
-class RoundRect(displayio.TileGrid):
+
+class RoundRect(_Rectangle):
     """A round-corner rectangle.
+
+    The rectangle is drawn with :py:mod:`vectorio` when the firmware has it, which needs no
+    bitmap and draws the corners on the GPU where the display has one. Older firmware builds
+    a bitmap instead.
 
     :param int x: The x-position of the top left corner.
     :param int y: The y-position of the top left corner.
@@ -56,51 +73,64 @@ class RoundRect(displayio.TileGrid):
         if r > width / 2 or r > height / 2:
             raise ValueError("Radius cannot exceed half of the smaller side (width or height).")
 
-        self._palette = displayio.Palette(3)
+        self._palette = displayio.Palette(2 if HAS_VECTORIO else 3)
         self._palette.make_transparent(0)
-        self._bitmap = displayio.Bitmap(width, height, 3)
-        for i in range(0, width):  # draw the center chunk
-            for j in range(r, height - r):  # draw the center chunk
-                self._bitmap[i, j] = 2
-        self._helper(
-            r,
-            r,
-            r,
-            color=2,
-            fill=True,
-            x_offset=width - 2 * r - 1,
-            y_offset=height - 2 * r - 1,
-        )
+        self._palette.make_transparent(_FILL)
+        self._palette.make_transparent(_OUTLINE)
 
-        if fill is not None:
-            self._palette[2] = fill
-            self._palette.make_opaque(2)
+        if HAS_VECTORIO:
+            # vectorio clamps the radius to half of the shortest side itself, and draws the
+            # corner and the outline inside the rectangle's bounds.
+            super().__init__(
+                pixel_shader=self._palette,
+                width=width,
+                height=height,
+                x=x,
+                y=y,
+                radius=r,
+                outline_width=stroke,
+                outline_color_index=_OUTLINE if outline is not None else None,
+            )
         else:
-            self._palette.make_transparent(2)
-            self._palette[2] = 0
-
-        if outline is not None:
-            self._palette[1] = outline
-            # draw flat sides
-            for w in range(r, width - r):
-                for line in range(stroke):
-                    self._bitmap[w, line] = 1
-                    self._bitmap[w, height - line - 1] = 1
-            for _h in range(r, height - r):
-                for line in range(stroke):
-                    self._bitmap[line, _h] = 1
-                    self._bitmap[width - line - 1, _h] = 1
-            # draw round corners
+            self._r = r
+            self._bitmap = displayio.Bitmap(width, height, 3)
+            for i in range(0, width):  # draw the center chunk
+                for j in range(r, height - r):  # draw the center chunk
+                    self._bitmap[i, j] = _FILL
             self._helper(
                 r,
                 r,
                 r,
-                color=1,
-                stroke=stroke,
+                color=_FILL,
+                fill=True,
                 x_offset=width - 2 * r - 1,
                 y_offset=height - 2 * r - 1,
             )
-        super().__init__(self._bitmap, pixel_shader=self._palette, x=x, y=y)
+
+            if outline is not None:
+                # draw flat sides
+                for w in range(r, width - r):
+                    for line in range(stroke):
+                        self._bitmap[w, line] = _OUTLINE
+                        self._bitmap[w, height - line - 1] = _OUTLINE
+                for _h in range(r, height - r):
+                    for line in range(stroke):
+                        self._bitmap[line, _h] = _OUTLINE
+                        self._bitmap[width - line - 1, _h] = _OUTLINE
+                # draw round corners
+                self._helper(
+                    r,
+                    r,
+                    r,
+                    color=_OUTLINE,
+                    stroke=stroke,
+                    x_offset=width - 2 * r - 1,
+                    y_offset=height - 2 * r - 1,
+                )
+            super().__init__(self._bitmap, pixel_shader=self._palette, x=x, y=y)
+
+        self.fill = fill
+        self.outline = outline
 
     def _helper(
         self,
@@ -162,42 +192,43 @@ class RoundRect(displayio.TileGrid):
     def fill(self) -> Optional[int]:
         """The fill of the rounded-corner rectangle. Can be a hex value for a color or ``None`` for
         transparent."""
-        return self._palette[2]
+        return get_color(self._palette, _FILL)
 
     @fill.setter
     def fill(self, color: Optional[int]) -> None:
-        if color is None:
-            self._palette[2] = 0
-            self._palette.make_transparent(2)
-        else:
-            self._palette[2] = color
-            self._palette.make_opaque(2)
+        set_color(self._palette, _FILL, color)
 
     @property
     def outline(self) -> Optional[int]:
         """The outline of the rounded-corner rectangle. Can be a hex value for a color or ``None``
         for no outline."""
-        return self._palette[1]
+        return get_color(self._palette, _OUTLINE)
 
     @outline.setter
     def outline(self, color: Optional[int]) -> None:
-        if color is None:
-            self._palette[1] = 0
-            self._palette.make_transparent(1)
-        else:
-            self._palette[1] = color
-            self._palette.make_opaque(2)
+        set_color(self._palette, _OUTLINE, color)
 
-    @property
-    def width(self) -> int:
-        """
-        :return: the width of the rounded rectangle in pixels
-        """
-        return self._bitmap.width
+    if not HAS_VECTORIO:
+        # A vectorio shape can be resized and re-rounded, so it answers these itself. A bitmap
+        # can't be, so they stay read only there.
 
-    @property
-    def height(self) -> int:
-        """
-        :return: the height of the rounded rectangle in pixels
-        """
-        return self._bitmap.height
+        @property
+        def width(self) -> int:
+            """
+            :return: the width of the rounded rectangle in pixels
+            """
+            return self._bitmap.width
+
+        @property
+        def height(self) -> int:
+            """
+            :return: the height of the rounded rectangle in pixels
+            """
+            return self._bitmap.height
+
+        @property
+        def radius(self) -> int:
+            """
+            :return: the radius of the rounded corners in pixels
+            """
+            return self._r

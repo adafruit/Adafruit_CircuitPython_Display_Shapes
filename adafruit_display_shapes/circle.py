@@ -35,6 +35,9 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Shapes.gi
 class Circle(RoundRect):
     """A circle.
 
+    The circle is drawn as a rounded rectangle whose radius is half of its size, so it is
+    drawn with :py:mod:`vectorio` when the firmware has it and from a bitmap when it doesn't.
+
     :param int x0: The x-position of the center.
     :param int y0: The y-position of the center.
     :param int r: The radius of the circle.
