@@ -90,7 +90,8 @@ class Rect(_Rectangle):
                 height=height,
                 x=x,
                 y=y,
-                outline_width=stroke,
+                # vectorio allows at most half the shortest side.
+                outline_width=min(stroke, min(width, height) // 2),
                 outline_color_index=_OUTLINE if outline is not None else None,
             )
         else:
