@@ -90,8 +90,7 @@ class Rect(_Rectangle):
                 height=height,
                 x=x,
                 y=y,
-                # vectorio allows at most half the shortest side; the bitmap path filled
-                # the shape with the outline color when the stroke was wider than that.
+                # vectorio allows at most half the shortest side.
                 outline_width=min(stroke, min(width, height) // 2),
                 outline_color_index=_OUTLINE if outline is not None else None,
             )
